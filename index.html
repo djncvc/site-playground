@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Центар за надареност НАУМ</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide Icons (Development Version) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Custom scrollbar hiding for the filter section */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Since we are in a standalone HTML file, we access React and Lucide from the global window object
+        const { useState, useEffect } = React;
+        
+        // Icon wrapper component to make Lucide icons work like React components in this standalone file
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const iconName = name.charAt(0).toLowerCase() + name.slice(1);
+            
+            // Render an SVG placeholder that Lucide will inject content into, 
+            // or use Lucide's createIcons method logic manually if needed.
+            // However, for React in CDN, it's easier to use the specific lucide-react CDN or just simple SVGs.
+            // To keep it robust without complex import maps, we will use a small mapping or direct SVG rendering.
+            // BETTER APPROACH for this single file: We will use the lucide-react ESM build via a specialized script below this component block.
+            return <i data-lucide={name.toLowerCase()} width={size} height={size} className={className}></i>;
+        };
+
+        // Simplified icon mapping for the "Show Someone" demo
+        // We use the global 'lucide' object to create icons after render
+        
+        // --- DATA MOCKS ---
+        const PROGRAMS_DATA = [
+            {
+                id: 1,
+                title: "Мала школа мишљења",
+                age: "Предшколски",
+                area: "Логика и филозофија",
+                status: "Отворене пријаве",
+                description: "Програм намјењен развоју критичког мишљења код најмлађих кроз игру и дијалог."
+            },
+            {
+                id: 2,
+                title: "Млади математичари",
+                age: "Основна школа",
+                area: "STEM",
+                status: "Попуњено",
+                description: "Напредна математика за талентоване основце. Припрема за такмичења."
+            },
+            {
+                id: 3,
+                title: "Креативно писање",
+                age: "Средња школа",
+                area: "Умјетност",
+                status: "Отворене пријаве",
+                description: "Радионица за будуће писце, новинаре и све који желе да се изразе ријечима."
+            },
+            {
+                id: 4,
+                title: "Роботика и АИ",
+                age: "Основна школа",
+                area: "STEM",
+                status: "Најава",
+                description: "Увод у свијет вјештачке интелигенције и роботике."
+            }
+        ];
+
+        const NEWS_DATA = [
+            {
+                id: 1,
+                date: "25. Дец 2024",
+                title: "Отворен конкурс за нове менторе",
+                summary: "НАУМ позива стручњаке из различитих области да се придруже нашем тиму."
+            },
+            {
+                id: 2,
+                date: "20. Дец 2024",
+                title: "Успјешно завршен зимски камп",
+                summary: "Преко 50 полазника је уживало у научним радионицама на Козари."
+            }
+        ];
+
+        const PARTNERS_LOGOS = [
+            { name: "Филозофски факултет", color: "bg-blue-100" },
+            { name: "Министарство просвјете", color: "bg-red-100" },
+            { name: "Град Бања Лука", color: "bg-green-100" },
+            { name: "Универзитет у БЛ", color: "bg-yellow-100" }
+        ];
+
+        // --- COMPONENTS ---
+
+        const Section = ({ children, className = "", id = "" }) => (
+            <section id={id} className={`py-12 px-4 md:px-8 max-w-7xl mx-auto ${className}`}>
+                {children}
+            </section>
+        );
+
+        const Button = ({ children, primary = true, onClick, className = "" }) => (
+            <button 
+                onClick={onClick}
+                className={`
+                px-6 py-3 rounded-full font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-md
+                ${primary 
+                    ? "bg-blue-600 text-white hover:bg-blue-700" 
+                    : "bg-white text-blue-900 border-2 border-blue-100 hover:border-blue-300"}
+                ${className}
+                `}
+            >
+                {children}
+            </button>
+        );
+
+        const Card = ({ children, className = "" }) => (
+            <div className={`bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow border border-slate-100 ${className}`}>
+                {children}
+            </div>
+        );
+
+        // --- ICONS ---
+        // Since we are using Lucide CDN (vanilla), we need a helper to render SVGs
+        // For this demo, we will use simple SVG strings for reliability in a single file
+        // or rely on lucide.createIcons() in a useEffect.
+        
+        const LucideIcon = ({ name, className }) => {
+             React.useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+             });
+             return <i data-lucide={name} className={className}></i>
+        }
+
+        // --- MAIN APP COMPONENT ---
+
+        function App() {
+            const [currentPage, setCurrentPage] = useState('home');
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [activeFilter, setActiveFilter] = useState('Сви');
+
+            // Re-run icon generation when page changes
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [currentPage, isMenuOpen, activeFilter]);
+
+            // Navigation Items
+            const navItems = [
+                { id: 'home', label: 'Почетна' },
+                { id: 'about', label: 'О нама' },
+                { id: 'programs', label: 'Програми' },
+                { id: 'mentors', label: 'Ментори' },
+                { id: 'apply', label: 'Пријаве' },
+                { id: 'news', label: 'Вијести' },
+                { id: 'contact', label: 'Контакт' },
+            ];
+
+            const navigateTo = (pageId) => {
+                setCurrentPage(pageId);
+                setIsMenuOpen(false);
+                window.scrollTo(0, 0);
+            };
+
+            // --- VIEWS ---
+
+            const HomeView = () => (
+                <React.Fragment>
+                {/* Hero Section */}
+                <div className="relative bg-gradient-to-br from-blue-900 to-indigo-800 text-white overflow-hidden rounded-b-[3rem] shadow-2xl">
+                    <div className="relative px-6 py-20 md:py-32 flex flex-col items-center text-center max-w-4xl mx-auto">
+                    <span className="bg-blue-500/30 text-blue-100 px-4 py-1 rounded-full text-sm font-bold mb-6 tracking-wide uppercase backdrop-blur-sm">
+                        Центар за надареност
+                    </span>
+                    <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+                        Откривамо и развијамо <br className="hidden md:block" />
+                        <span className="text-yellow-400">таленте будућности</span>
+                    </h1>
+                    <p className="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl leading-relaxed">
+                        НАУМ је мјесто гдје радозналост сусреће знање. Повезујемо талентовану дјецу, посвећене менторе и науку.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        <Button onClick={() => navigateTo('apply')} className="w-full sm:w-auto">
+                        Пријави дијете
+                        </Button>
+                        <Button primary={false} onClick={() => navigateTo('mentors')} className="w-full sm:w-auto">
+                        Постани ментор
+                        </Button>
+                    </div>
+                    </div>
+                </div>
+
+                {/* Mission Short */}
+                <Section className="text-center">
+                    <h2 className="text-3xl font-bold text-slate-800 mb-8">Наша Мисија</h2>
+                    <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                    Центар за надареност НАУМ, при Филозофском факултету Универзитета у Бањој Луци, посвећен је идентификацији, подршци и развоју даровите дјеце и младих у Републици Српској.
+                    </p>
+                </Section>
+
+                {/* Featured Programs Carousel (Simplified as Grid for MVP) */}
+                <Section className="bg-slate-50 rounded-3xl my-8">
+                    <div className="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 className="text-3xl font-bold text-slate-800">Истакнути програми</h2>
+                        <p className="text-slate-500 mt-2">Одаберите програм који одговара узрасту</p>
+                    </div>
+                    <button onClick={() => navigateTo('programs')} className="text-blue-600 font-bold hidden md:flex items-center hover:underline">
+                        Види све <LucideIcon name="chevron-right" className="ml-1 w-5 h-5" />
+                    </button>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {PROGRAMS_DATA.slice(0, 3).map(program => (
+                        <Card key={program.id} className="flex flex-col h-full">
+                        <div className="mb-4">
+                            <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
+                            {program.age}
+                            </span>
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">{program.title}</h3>
+                        <p className="text-slate-600 mb-6 flex-grow">{program.description}</p>
+                        <div className="flex justify-between items-center mt-auto border-t border-slate-100 pt-4">
+                            <span className={`text-sm font-semibold ${program.status === 'Попуњено' ? 'text-red-500' : 'text-green-600'}`}>
+                            {program.status}
+                            </span>
+                            <button 
+                            onClick={() => navigateTo('apply')}
+                            className="text-blue-600 hover:bg-blue-50 p-2 rounded-full transition-colors">
+                            <LucideIcon name="arrow-right" className="w-5 h-5" />
+                            </button>
+                        </div>
+                        </Card>
+                    ))}
+                    </div>
+                    <div className="mt-8 text-center md:hidden">
+                        <Button primary={false} onClick={() => navigateTo('programs')}>Сви програми</Button>
+                    </div>
+                </Section>
+
+                {/* Call for Mentors */}
+                <Section className="bg-blue-900 rounded-3xl text-white relative overflow-hidden">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                    <div className="flex-1">
+                        <h2 className="text-3xl font-bold mb-4">Подијели знање, инспириши будућност</h2>
+                        <p className="text-blue-100 text-lg mb-6">
+                        Тражимо стручњаке, професоре и ентузијасте спремне да раде са најталентованијим младим умовима.
+                        </p>
+                        <Button onClick={() => navigateTo('mentors')} className="bg-yellow-400 text-blue-900 hover:bg-yellow-300 border-none">
+                        Пријави се као ментор
+                        </Button>
+                    </div>
+                    <div className="flex-1 flex justify-center">
+                        <div className="bg-white/10 p-6 rounded-full backdrop-blur-sm">
+                        <LucideIcon name="user" className="w-20 h-20 text-yellow-400" />
+                        </div>
+                    </div>
+                    </div>
+                </Section>
+
+                {/* Partners Logos */}
+                <Section className="text-center">
+                    <h3 className="text-slate-400 font-bold uppercase tracking-widest mb-8 text-sm">Пријатељи НАУМ-а</h3>
+                    <div className="flex flex-wrap justify-center gap-8 md:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                    {PARTNERS_LOGOS.map((partner, idx) => (
+                        <div key={idx} className={`h-16 w-32 ${partner.color} rounded-lg flex items-center justify-center text-xs font-bold text-slate-600 p-2`}>
+                        {partner.name}
+                        </div>
+                    ))}
+                    </div>
+                </Section>
+                </React.Fragment>
+            );
+
+            const AboutView = () => (
+                <Section>
+                <h1 className="text-4xl font-bold text-slate-900 mb-6">О НАУМУ</h1>
+                <div className="prose prose-lg text-slate-600 max-w-none">
+                    <p className="lead text-xl mb-6">
+                    Центар за надареност НАУМ је институционални оквир за подршку даровитости при Филозофском факултету у Бањој Луци.
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-8 my-12">
+                        <Card className="bg-blue-50 border-none">
+                            <h3 className="text-2xl font-bold text-blue-900 mb-4">Наша Мисија</h3>
+                            <p>Препознавање, праћење и подстицање развоја даровитих појединаца кроз менторски рад, специјализоване програме и сарадњу са породицом и школом.</p>
+                        </Card>
+                        <Card className="bg-yellow-50 border-none">
+                            <h3 className="text-2xl font-bold text-yellow-900 mb-4">Наша Визија</h3>
+                            <p>Друштво у којем сваки појединац има прилику да оствари своје пуне потенцијале и допринесе заједници кроз изврсност.</p>
+                        </Card>
+                    </div>
+                    <h3 className="text-2xl font-bold text-slate-800 mb-4">Историјат</h3>
+                    <p>
+                    Основани смо са идејом да попунимо празнину у образовном систему када је ријеч о раду са талентованом дјецом. Наш тим чине универзитетски професори, психолози, педагози и стручњаци из праксе.
+                    </p>
+                </div>
+                </Section>
+            );
+
+            const ProgramsView = () => {
+                const filters = ['Сви', 'Предшколски', 'Основна школа', 'Средња школа'];
+                const filteredPrograms = activeFilter === 'Сви' 
+                ? PROGRAMS_DATA 
+                : PROGRAMS_DATA.filter(p => p.age === activeFilter);
+
+                return (
+                <Section>
+                    <div className="text-center mb-10">
+                        <h1 className="text-4xl font-bold text-slate-900 mb-4">Наши Програми</h1>
+                        <p className="text-xl text-slate-500">Пронађите савршен изазов за ваше дијете</p>
+                    </div>
+
+                    <div className="flex overflow-x-auto pb-4 gap-3 mb-8 no-scrollbar md:justify-center">
+                        {filters.map(filter => (
+                            <button
+                                key={filter}
+                                onClick={() => setActiveFilter(filter)}
+                                className={`whitespace-nowrap px-5 py-2 rounded-full font-medium transition-colors ${
+                                    activeFilter === filter 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                }`}
+                            >
+                                {filter}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {filteredPrograms.map(program => (
+                            <Card key={program.id} className="flex flex-col md:flex-row gap-6 hover:border-blue-200 transition-colors">
+                                <div className="w-full md:w-1/3 bg-slate-100 rounded-xl h-48 md:h-auto flex items-center justify-center">
+                                    <LucideIcon name="book-open" className="text-slate-300 w-10 h-10" />
+                                </div>
+                                <div className="flex-1 py-2">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className="text-sm font-bold text-blue-600 uppercase tracking-wider">{program.area}</span>
+                                        <span className={`text-xs px-2 py-1 rounded bg-slate-100 ${program.status === 'Попуњено' ? 'text-red-500' : 'text-green-600 font-bold'}`}>
+                                            {program.status}
+                                        </span>
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-2">{program.title}</h3>
+                                    <p className="text-slate-600 mb-4">{program.description}</p>
+                                    <div className="flex items-center gap-4 text-sm text-slate-500 mb-6">
+                                        <span className="flex items-center gap-1"><LucideIcon name="user" className="w-4 h-4"/> {program.age}</span>
+                                    </div>
+                                    <Button onClick={() => navigateTo('apply')} className="w-full md:w-auto text-sm py-2">Пријави се</Button>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </Section>
+                );
+            };
+
+            const MentorsView = () => (
+                <Section>
+                    <div className="max-w-3xl mx-auto text-center mb-12">
+                        <h1 className="text-4xl font-bold text-slate-900 mb-4">Менторска Мрежа</h1>
+                        <p className="text-xl text-slate-600">Ментори су срце нашег програма. Они не само да преносе знање, већ пале искру радозналости.</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-8 mb-16">
+                        <div className="text-center p-4">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
+                                <LucideIcon name="heart" className="w-8 h-8" />
+                            </div>
+                            <h3 className="font-bold text-lg mb-2">Инспиришите</h3>
+                            <p className="text-slate-500">Радите са младима који желе да уче више и брже.</p>
+                        </div>
+                        <div className="text-center p-4">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
+                                <LucideIcon name="map-pin" className="w-8 h-8" />
+                            </div>
+                            <h3 className="font-bold text-lg mb-2">Умрежите се</h3>
+                            <p className="text-slate-500">Постаните дио академске заједнице НАУМ-а.</p>
+                        </div>
+                        <div className="text-center p-4">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
+                                <LucideIcon name="check-circle" className="w-8 h-8" />
+                            </div>
+                            <h3 className="font-bold text-lg mb-2">Допринесите</h3>
+                            <p className="text-slate-500">Оставите траг у развоју будућих лидера.</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-50 p-8 rounded-3xl max-w-2xl mx-auto border border-slate-200">
+                        <h3 className="text-2xl font-bold text-slate-800 mb-6 text-center">Пријава за Менторе</h3>
+                        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert("Хвала на интересовању! Контактираћемо вас ускоро."); }}>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Име и Презиме</label>
+                                <input type="text" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="нпр. Марко Марковић" required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Област стручности</label>
+                                <input type="text" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="нпр. Математика, Физика..." required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Е-маил адреса</label>
+                                <input type="email" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ваша@адреса.цом" required />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Кратка биографија / Мотивација</label>
+                                <textarea rows="4" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Зашто желите да будете ментор?" required></textarea>
+                            </div>
+                            <Button className="w-full">Пошаљи пријаву</Button>
+                        </form>
+                    </div>
+                </Section>
+            );
+
+            const ApplyView = () => (
+                <Section>
+                    <div className="max-w-2xl mx-auto">
+                        <div className="text-center mb-10">
+                            <span className="text-blue-600 font-bold tracking-wider uppercase text-sm">Упис нових чланова</span>
+                            <h1 className="text-4xl font-bold text-slate-900 mt-2 mb-4">Пријава полазника</h1>
+                            <p className="text-slate-500">Попуните формулар испод да пријавите дијете на један од наших програма. Након пријаве добићете потврду на е-маил.</p>
+                        </div>
+
+                        <Card className="border-t-4 border-blue-600">
+                            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Пријава успјешно послата! Провјерите е-маил."); }}>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Име дјетета</label>
+                                        <input type="text" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Презиме дјетета</label>
+                                        <input type="text" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Датум рођења</label>
+                                    <input type="date" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Жељени програм</label>
+                                    <select className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                        {PROGRAMS_DATA.map(p => (
+                                            <option key={p.id} value={p.id}>{p.title} ({p.age})</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="border-t border-slate-100 pt-6">
+                                    <h4 className="font-bold text-slate-800 mb-4">Подаци о родитељу/старатељу</h4>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Име и Презиме</label>
+                                            <input type="text" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-slate-700 mb-1">Телефон</label>
+                                            <input type="tel" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required />
+                                        </div>
+                                    </div>
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Е-маил (за потврду)</label>
+                                        <input type="email" className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none" required />
+                                    </div>
+                                </div>
+
+                                <Button className="w-full text-lg">Пошаљи пријаву</Button>
+                            </form>
+                        </Card>
+
+                        <div className="mt-12">
+                            <h3 className="text-xl font-bold text-slate-800 mb-4">Честа питања (FAQ)</h3>
+                            <div className="space-y-4">
+                                <details className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 cursor-pointer">
+                                    <summary className="font-bold text-slate-700">Колико коштају програми?</summary>
+                                    <p className="mt-2 text-slate-600">Цијена зависи од програма. Неки програми су потпуно бесплатни захваљујући донаторима.</p>
+                                </details>
+                                <details className="bg-white p-4 rounded-lg shadow-sm border border-slate-200 cursor-pointer">
+                                    <summary className="font-bold text-slate-700">Како се врши селекција?</summary>
+                                    <p className="mt-2 text-slate-600">Селекција се врши на основу тестирања способности и интервјуа са психолозима Центра.</p>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+                </Section>
+            );
+
+            const NewsView = () => (
+                <Section>
+                    <h1 className="text-4xl font-bold text-slate-900 mb-8">Вијести и Догађаји</h1>
+                    <div className="grid gap-6">
+                        {NEWS_DATA.map(news => (
+                            <Card key={news.id} className="flex flex-col md:flex-row gap-6">
+                                <div className="bg-slate-100 w-full md:w-48 h-48 rounded-lg flex-shrink-0 flex items-center justify-center text-slate-400">
+                                    <LucideIcon name="calendar" className="w-10 h-10" />
+                                </div>
+                                <div>
+                                    <span className="text-blue-600 font-bold text-sm">{news.date}</span>
+                                    <h2 className="text-2xl font-bold text-slate-900 mt-1 mb-2 hover:text-blue-700 cursor-pointer">{news.title}</h2>
+                                    <p className="text-slate-600">{news.summary}</p>
+                                    <button className="mt-4 text-blue-600 font-bold flex items-center gap-1 hover:gap-2 transition-all">
+                                        Прочитај више <LucideIcon name="arrow-right" className="w-4 h-4 ml-1"/>
+                                    </button>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </Section>
+            );
+
+            const ContactView = () => (
+                <Section>
+                    <div className="grid md:grid-cols-2 gap-12">
+                        <div>
+                            <h1 className="text-4xl font-bold text-slate-900 mb-6">Контактирајте нас</h1>
+                            <p className="text-xl text-slate-600 mb-8">Имате питања о програмима или желите сарадњу? Ту смо за вас.</p>
+                            
+                            <div className="space-y-6">
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-blue-100 p-3 rounded-full text-blue-600">
+                                        <LucideIcon name="map-pin" className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-900">Адреса</h4>
+                                        <p className="text-slate-600">Филозофски факултет<br/>Булевар војводе Петра Бојовића 1A<br/>78000 Бања Лука</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-blue-100 p-3 rounded-full text-blue-600">
+                                        <LucideIcon name="mail" className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-900">Е-маил</h4>
+                                        <p className="text-slate-600">info@naum-centar.org</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-blue-100 p-3 rounded-full text-blue-600">
+                                        <LucideIcon name="phone" className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-900">Телефон</h4>
+                                        <p className="text-slate-600">+387 51 123 456</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <Card className="bg-slate-50">
+                            <form className="space-y-4" onSubmit={(e) => {e.preventDefault(); alert("Порука послата!");}}>
+                                <h3 className="font-bold text-xl mb-4">Пошаљите поруку</h3>
+                                <input type="text" placeholder="Ваше Име" className="w-full p-3 rounded-lg border border-slate-300 outline-none focus:border-blue-500" />
+                                <input type="email" placeholder="Ваш Е-маил" className="w-full p-3 rounded-lg border border-slate-300 outline-none focus:border-blue-500" />
+                                <textarea rows="4" placeholder="Порука..." className="w-full p-3 rounded-lg border border-slate-300 outline-none focus:border-blue-500"></textarea>
+                                <Button className="w-full">Пошаљи</Button>
+                            </form>
+                        </Card>
+                    </div>
+                </Section>
+            );
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-200">
+                
+                {/* --- HEADER --- */}
+                <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100 transition-all">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center h-20">
+                        
+                        {/* Logo */}
+                        <div 
+                            className="flex items-center gap-3 cursor-pointer" 
+                            onClick={() => navigateTo('home')}
+                        >
+                        <div className="bg-blue-600 text-white font-bold p-2 rounded-lg text-xl">НАУМ</div>
+                        <div className="hidden sm:block leading-tight text-sm font-bold text-slate-700 uppercase tracking-tight">
+                            Центар за надареност<br/>
+                            <span className="text-blue-600">Универзитет у Бањој Луци</span>
+                        </div>
+                        </div>
+
+                        {/* Desktop Nav */}
+                        <nav className="hidden lg:flex space-x-1">
+                        {navItems.map(item => (
+                            <button
+                            key={item.id}
+                            onClick={() => navigateTo(item.id)}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                currentPage === item.id 
+                                ? 'bg-blue-50 text-blue-700' 
+                                : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
+                            }`}
+                            >
+                            {item.label}
+                            </button>
+                        ))}
+                        </nav>
+
+                        {/* Mobile Menu Button */}
+                        <button 
+                        className="lg:hidden p-2 rounded-md text-slate-600 hover:bg-slate-100"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        >
+                        {isMenuOpen ? <LucideIcon name="x" className="w-7 h-7" /> : <LucideIcon name="menu" className="w-7 h-7" />}
+                        </button>
+                    </div>
+                    </div>
+
+                    {/* Mobile Nav Dropdown */}
+                    {isMenuOpen && (
+                    <div className="lg:hidden bg-white border-t border-slate-100 absolute w-full shadow-xl">
+                        <div className="px-4 py-6 space-y-2">
+                        {navItems.map(item => (
+                            <button
+                            key={item.id}
+                            onClick={() => navigateTo(item.id)}
+                            className={`block w-full text-left px-4 py-4 rounded-xl text-lg font-medium ${
+                                currentPage === item.id 
+                                ? 'bg-blue-50 text-blue-700' 
+                                : 'text-slate-600 hover:bg-slate-50'
+                            }`}
+                            >
+                            {item.label}
+                            </button>
+                        ))}
+                        <div className="pt-4 mt-4 border-t border-slate-100">
+                            <Button onClick={() => navigateTo('apply')} className="w-full justify-center">Пријави се</Button>
+                        </div>
+                        </div>
+                    </div>
+                    )}
+                </header>
+
+                {/* --- MAIN CONTENT --- */}
+                <main className="min-h-[calc(100vh-300px)] animate-in fade-in duration-500">
+                    {currentPage === 'home' && <HomeView />}
+                    {currentPage === 'about' && <AboutView />}
+                    {currentPage === 'programs' && <ProgramsView />}
+                    {currentPage === 'mentors' && <MentorsView />}
+                    {currentPage === 'apply' && <ApplyView />}
+                    {currentPage === 'news' && <NewsView />}
+                    {currentPage === 'contact' && <ContactView />}
+                </main>
+
+                {/* --- FOOTER --- */}
+                <footer className="bg-slate-900 text-slate-400 py-12 md:py-16 mt-12">
+                    <div className="max-w-7xl mx-auto px-4 md:px-8 grid md:grid-cols-4 gap-8">
+                    <div className="col-span-1 md:col-span-2">
+                        <div className="flex items-center gap-2 mb-6">
+                            <div className="bg-white text-slate-900 font-bold p-1 rounded text-lg">НАУМ</div>
+                            <span className="text-white font-bold text-lg">Центар за надареност</span>
+                        </div>
+                        <p className="max-w-sm mb-6">
+                        Институционални оквир за подршку даровитој дјеци и младима. Филозофски факултет Универзитета у Бањој Луци.
+                        </p>
+                        <div className="flex gap-4">
+                            {/* Social Placeholders */}
+                            <div className="w-10 h-10 bg-slate-800 rounded-full hover:bg-blue-600 cursor-pointer transition-colors flex items-center justify-center">F</div>
+                            <div className="w-10 h-10 bg-slate-800 rounded-full hover:bg-pink-600 cursor-pointer transition-colors flex items-center justify-center">I</div>
+                            <div className="w-10 h-10 bg-slate-800 rounded-full hover:bg-blue-400 cursor-pointer transition-colors flex items-center justify-center">L</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 className="text-white font-bold mb-4 uppercase text-sm tracking-wider">Линкови</h4>
+                        <ul className="space-y-3">
+                        <li><button onClick={() => navigateTo('programs')} className="hover:text-white transition-colors">Програми</button></li>
+                        <li><button onClick={() => navigateTo('mentors')} className="hover:text-white transition-colors">Постани Ментор</button></li>
+                        <li><button onClick={() => navigateTo('news')} className="hover:text-white transition-colors">Вијести</button></li>
+                        <li><button onClick={() => navigateTo('contact')} className="hover:text-white transition-colors">Контакт</button></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 className="text-white font-bold mb-4 uppercase text-sm tracking-wider">Контакт</h4>
+                        <ul className="space-y-3 text-sm">
+                        <li>Филозофски факултет УНИБЛ</li>
+                        <li>Бања Лука, Република Српска</li>
+                        <li>info@naum-centar.org</li>
+                        <li>+387 51 123 456</li>
+                        </ul>
+                    </div>
+                    </div>
+                    <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm">
+                    &copy; {new Date().getFullYear()} Центар за надареност НАУМ. Сва права задржана.
+                    </div>
+                </footer>
+
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
