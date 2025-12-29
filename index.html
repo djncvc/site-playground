@@ -33,23 +33,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // Since we are in a standalone HTML file, we access React and Lucide from the global window object
         const { useState, useEffect } = React;
-        
-        // Icon wrapper component to make Lucide icons work like React components in this standalone file
-        const Icon = ({ name, size = 24, className = "" }) => {
-            const iconName = name.charAt(0).toLowerCase() + name.slice(1);
-            
-            // Render an SVG placeholder that Lucide will inject content into, 
-            // or use Lucide's createIcons method logic manually if needed.
-            // However, for React in CDN, it's easier to use the specific lucide-react CDN or just simple SVGs.
-            // To keep it robust without complex import maps, we will use a small mapping or direct SVG rendering.
-            // BETTER APPROACH for this single file: We will use the lucide-react ESM build via a specialized script below this component block.
-            return <i data-lucide={name.toLowerCase()} width={size} height={size} className={className}></i>;
-        };
-
-        // Simplified icon mapping for the "Show Someone" demo
-        // We use the global 'lucide' object to create icons after render
         
         // --- DATA MOCKS ---
         const PROGRAMS_DATA = [
@@ -138,17 +122,9 @@
             </div>
         );
 
-        // --- ICONS ---
-        // Since we are using Lucide CDN (vanilla), we need a helper to render SVGs
-        // For this demo, we will use simple SVG strings for reliability in a single file
-        // or rely on lucide.createIcons() in a useEffect.
-        
+        // --- ICONS HELPER ---
         const LucideIcon = ({ name, className }) => {
-             React.useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-             });
+             // Basic implementation to ensure icons render
              return <i data-lucide={name} className={className}></i>
         }
 
@@ -159,7 +135,6 @@
             const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [activeFilter, setActiveFilter] = useState('Сви');
 
-            // Re-run icon generation when page changes
             useEffect(() => {
                 if (window.lucide) {
                     window.lucide.createIcons();
@@ -219,7 +194,7 @@
                     </p>
                 </Section>
 
-                {/* Featured Programs Carousel (Simplified as Grid for MVP) */}
+                {/* Featured Programs Carousel */}
                 <Section className="bg-slate-50 rounded-3xl my-8">
                     <div className="flex justify-between items-end mb-8">
                     <div>
@@ -592,7 +567,9 @@
                             className="flex items-center gap-3 cursor-pointer" 
                             onClick={() => navigateTo('home')}
                         >
-                        <div className="bg-blue-600 text-white font-bold p-2 rounded-lg text-xl">НАУМ</div>
+                        {/* NEW LOGO IMAGE HERE */}
+                        <img src="logo.jpg" alt="НАУМ Лого" className="h-12 w-auto object-contain rounded-lg" />
+                        
                         <div className="hidden sm:block leading-tight text-sm font-bold text-slate-700 uppercase tracking-tight">
                             Центар за надареност<br/>
                             <span className="text-blue-600">Универзитет у Бањој Луци</span>
@@ -667,7 +644,8 @@
                     <div className="max-w-7xl mx-auto px-4 md:px-8 grid md:grid-cols-4 gap-8">
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center gap-2 mb-6">
-                            <div className="bg-white text-slate-900 font-bold p-1 rounded text-lg">НАУМ</div>
+                            {/* NEW LOGO IMAGE IN FOOTER */}
+                            <img src="logo.jpg" alt="НАУМ Лого" className="h-10 w-auto bg-white rounded p-0.5" />
                             <span className="text-white font-bold text-lg">Центар за надареност</span>
                         </div>
                         <p className="max-w-sm mb-6">
