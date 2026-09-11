@@ -1123,7 +1123,7 @@ function App() {
                                 alt="НАУМ Лого" 
                                 className="h-11 md:h-12 w-auto object-contain transition-transform group-hover:scale-105" 
                             />
-                            <div className="hidden sm:block leading-tight text-xs md:text-sm font-extrabold text-slate-800 uppercase tracking-tight border-l pl-3 border-slate-200">
+                            <div className="hidden sm:block leading-tight text-xs md:text-sm font-semibold text-slate-700 uppercase tracking-normal border-l pl-3 border-slate-200">
                                 {t?.brandSub || "Центар за надареност НАУМ"}
                             </div>
                         </div>
