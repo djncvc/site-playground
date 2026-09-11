@@ -1,7 +1,6 @@
 // app.js
 const { useState, useEffect } = React;
 
-// Safe references to global modules
 const Icon = window.Icon;
 const CONFIG = window.CONFIG;
 const DEFAULT_PROGRAMS = window.DEFAULT_PROGRAMS;
@@ -173,12 +172,33 @@ function App() {
         { id: 'about', label: t.nav.about },
         { id: 'programs', label: t.nav.programs },
         { id: 'mentors', label: t.nav.mentors },
+        { id: 'friends', label: t.nav.friends },
         { id: 'apply', label: t.nav.apply },
         { id: 'news', label: t.nav.news },
         { id: 'contact', label: t.nav.contact },
     ];
 
     const navigateTo = (pageId) => {
+        if (pageId === 'friends') {
+            setCurrentPage('home');
+            setIsMenuOpen(false);
+            setTimeout(() => {
+                const el = document.getElementById('partners-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+            return;
+        }
+
+        if (pageId === 'faq') {
+            setCurrentPage('apply');
+            setIsMenuOpen(false);
+            setTimeout(() => {
+                const el = document.getElementById('faq-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+            return;
+        }
+
         setCurrentPage(pageId);
         setIsMenuOpen(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -322,7 +342,8 @@ function App() {
                 </div>
             </Section>
 
-            <Section className="text-center pt-8 pb-16">
+            {/* Partners / Friends of NAUM section with anchor ID */}
+            <Section id="partners-section" className="text-center pt-8 pb-16 scroll-mt-24">
                 <h3 className="text-slate-400 font-bold uppercase tracking-widest mb-8 text-xs">
                     {t.partners.title}
                 </h3>
@@ -770,7 +791,8 @@ function App() {
                         </form>
                     </div>
 
-                    <div className="mt-12">
+                    {/* FAQ Section with anchor ID */}
+                    <div id="faq-section" className="mt-12 scroll-mt-24">
                         <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">{t.applyView.faqTitle}</h3>
                         <div className="space-y-3">
                             <details className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer">
@@ -876,7 +898,9 @@ function App() {
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-slate-900 text-sm">{t.contactView.emailLabel}</h4>
-                                    <p className="text-slate-600 text-sm">info@naum-centar.org</p>
+                                    <a href="mailto:naum@ff.unibl.org" className="text-slate-600 hover:text-teal-700 text-sm transition-colors">
+                                        naum@ff.unibl.org
+                                    </a>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">
@@ -930,7 +954,7 @@ function App() {
                                     type="email" 
                                     value={form.email}
                                     onChange={e => setForm({ ...form, email: e.target.value })}
-                                    placeholder="email@address.com" 
+                                    placeholder="naum@ff.unibl.org" 
                                     className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-teal-500" 
                                     required 
                                 />
@@ -972,9 +996,8 @@ function App() {
                                 alt="НАУМ Лого" 
                                 className="h-11 md:h-12 w-auto object-contain transition-transform group-hover:scale-105" 
                             />
-                            <div className="hidden sm:block leading-tight text-xs font-bold text-slate-700 uppercase tracking-tight border-l pl-3 border-slate-200">
-                                {t.brandSub}<br/>
-                                <span className="text-teal-700 font-semibold">{t.facultySub}</span>
+                            <div className="hidden sm:block leading-tight text-xs md:text-sm font-extrabold text-slate-800 uppercase tracking-tight border-l pl-3 border-slate-200">
+                                {t.brandSub}
                             </div>
                         </div>
 
@@ -1057,13 +1080,13 @@ function App() {
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center gap-3 mb-4">
                             <img src="logo.jpg" alt="НАУМ Лого" className="h-9 w-auto bg-white rounded-md p-1" />
-                            <span className="text-white font-extrabold text-base tracking-tight">{t.brandSub} НАУМ</span>
+                            <span className="text-white font-extrabold text-base tracking-tight">{t.brandSub}</span>
                         </div>
                         <p className="max-w-md text-sm text-slate-400 leading-relaxed mb-6">
                             {t.footer.desc}
                         </p>
                         <p className="text-xs text-slate-500">
-                            &copy; {new Date().getFullYear()} {t.brandSub} НАУМ. {t.footer.rights}
+                            &copy; {new Date().getFullYear()} {t.brandSub}. {t.footer.rights}
                         </p>
                     </div>
                     
@@ -1072,7 +1095,9 @@ function App() {
                         <ul className="space-y-2.5 text-sm">
                             <li><button onClick={() => navigateTo('programs')} className="hover:text-teal-400 transition-colors">{t.nav.programs}</button></li>
                             <li><button onClick={() => navigateTo('mentors')} className="hover:text-teal-400 transition-colors">{t.nav.mentors}</button></li>
+                            <li><button onClick={() => navigateTo('friends')} className="hover:text-teal-400 transition-colors">{t.nav.friends}</button></li>
                             <li><button onClick={() => navigateTo('apply')} className="hover:text-teal-400 transition-colors">{t.nav.apply}</button></li>
+                            <li><button onClick={() => navigateTo('faq')} className="hover:text-teal-400 transition-colors">{t.footer.faq}</button></li>
                             <li><button onClick={() => navigateTo('news')} className="hover:text-teal-400 transition-colors">{t.nav.news}</button></li>
                             <li><button onClick={() => navigateTo('contact')} className="hover:text-teal-400 transition-colors">{t.nav.contact}</button></li>
                         </ul>
@@ -1084,7 +1109,11 @@ function App() {
                             <li>{t.facultySub}</li>
                             <li>Булевар војводе Петра Бојовића 1А</li>
                             <li>78000 {t.footer.locationLine}</li>
-                            <li className="text-teal-400">info@naum-centar.org</li>
+                            <li>
+                                <a href="mailto:naum@ff.unibl.org" className="text-teal-400 hover:underline">
+                                    naum@ff.unibl.org
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

@@ -1,24 +1,25 @@
 // translations.js
 window.I18N = {
     sr: {
-        brandSub: "Центар за надареност",
-        facultySub: "Филозофски факултет Бања Лука",
+        brandSub: "Центар за надареност НАУМ",
+        facultySub: "Филозофски факултет Универзитета у Бањој Луци",
         submitting: "Слање података...",
         nav: {
             home: "Почетна",
             about: "О нама",
             programs: "Програми",
             mentors: "Ментори",
+            friends: "Пријатељи НАУМ-а",
             apply: "Пријаве",
             news: "Вијести",
             contact: "Контакт",
             enrollBtn: "Упис полазника"
         },
         hero: {
-            badge: "Центар за надареност • Филозофски факултет Бања Лука",
+            badge: "Филозофски факултет Универзитета у Бањој Луци",
             title1: "Откривамо и развијамо",
             title2: "таленте будућности",
-            desc: "НАУМ је мјесто гдје радозналост сусреће знање. Повезујемо талентовану дјецу, посвећене менторе и савремене научне методе.",
+            desc: "НАУМ је мјесто гдје радозналост сусреће знање. Повезујемо надарену и талентовану дјецу и младе, посвећене менторе и савремене научне методе.",
             btnApply: "Пријави дијете",
             btnMentor: "Постани ментор"
         },
@@ -42,7 +43,7 @@ window.I18N = {
             btn: "Пријави се као ментор"
         },
         partners: {
-            title: "Партнери и пријатељи центра",
+            title: "Пријатељи НАУМ-а",
             items: [
                 { name: "Филозофски факултет", color: "border-teal-200 text-teal-900 bg-teal-50/60" },
                 { name: "Министарство просвјете", color: "border-rose-200 text-rose-900 bg-rose-50/60" },
@@ -139,32 +140,34 @@ window.I18N = {
             successMsg: "Хвала на поруци! Ваша порука је уредно забиљежена и одговорићемо убрзо."
         },
         footer: {
-            desc: "Институционални оквир за подршку и развој талентоване дјеце и омладине при Филозофском факултету Универзитета у Бањој Луци.",
+            desc: "Институционални оквир за подршку и развој надарене и талентоване дјеце и младих при Филозофском факултету Универзитета у Бањој Луци.",
             rights: "Сва права задржана.",
             quickLinks: "Брзи линкови",
+            faq: "Често постављана питања",
             contactInfo: "Контакт инфо",
             locationLine: "Бања Лука, Република Српска"
         }
     },
     lat: {
-        brandSub: "Centar za nadarenost",
-        facultySub: "Filozofski fakultet Banja Luka",
+        brandSub: "Centar za nadarenost NAUM",
+        facultySub: "Filozofski fakultet Univerziteta u Banjoj Luci",
         submitting: "Slanje podataka...",
         nav: {
             home: "Početna",
             about: "O nama",
             programs: "Programi",
             mentors: "Mentori",
+            friends: "Prijatelji NAUM-a",
             apply: "Prijave",
             news: "Vijesti",
             contact: "Kontakt",
             enrollBtn: "Upis polaznika"
         },
         hero: {
-            badge: "Centar za nadarenost • Filozofski fakultet Banja Luka",
+            badge: "Filozofski fakultet Univerziteta u Banjoj Luci",
             title1: "Otkrivamo i razvijamo",
             title2: "talente budućnosti",
-            desc: "NAUM je mjesto gdje radoznalost susreće znanje. Povezujemo talentovanu djecu, posvećene mentore i savremene naučne metode.",
+            desc: "NAUM je mjesto gdje radoznalost susreće znanje. Povezujemo nadarenu i talentovanu djecu i mlade, posvećene mentore i savremene naučne metode.",
             btnApply: "Prijavi dijete",
             btnMentor: "Postani mentor"
         },
@@ -188,7 +191,7 @@ window.I18N = {
             btn: "Prijavi se kao mentor"
         },
         partners: {
-            title: "Partneri i prijatelji centra",
+            title: "Prijatelji NAUM-a",
             items: [
                 { name: "Filozofski fakultet", color: "border-teal-200 text-teal-900 bg-teal-50/60" },
                 { name: "Ministarstvo prosvjete", color: "border-rose-200 text-rose-900 bg-rose-50/60" },
@@ -285,32 +288,34 @@ window.I18N = {
             successMsg: "Hvala na poruci! Vaša poruka je uredno zabilježena i odgovorićemo ubrzo."
         },
         footer: {
-            desc: "Institucionalni okvir za podršku i razvoj talentovane djece i omladine pri Filozofskom fakultetu Univerziteta u Banjoj Luci.",
+            desc: "Institucionalni okvir za podršku i razvoj nadarene i talentovane djece i mladih pri Filozofskom fakultetu Univerziteta u Banjoj Luci.",
             rights: "Sva prava zadržana.",
             quickLinks: "Brzi linkovi",
+            faq: "Često postavljana pitanja",
             contactInfo: "Kontakt info",
             locationLine: "Banja Luka, Republika Srpska"
         }
     },
     en: {
-        brandSub: "Center for Giftedness",
-        facultySub: "Faculty of Philosophy Banja Luka",
+        brandSub: "Center for Giftedness NAUM",
+        facultySub: "Faculty of Philosophy, University of Banja Luka",
         submitting: "Submitting...",
         nav: {
             home: "Home",
             about: "About",
             programs: "Programs",
             mentors: "Mentors",
+            friends: "Friends of NAUM",
             apply: "Apply",
             news: "News",
             contact: "Contact",
             enrollBtn: "Enroll Now"
         },
         hero: {
-            badge: "Center for Giftedness • Faculty of Philosophy Banja Luka",
+            badge: "Faculty of Philosophy, University of Banja Luka",
             title1: "Discovering and nurturing",
             title2: "talents of the future",
-            desc: "NAUM is a place where curiosity meets knowledge. We connect talented youth, dedicated mentors, and modern scientific approaches.",
+            desc: "NAUM is a place where curiosity meets knowledge. We connect gifted and talented children and youth, dedicated mentors, and modern scientific approaches.",
             btnApply: "Register a Child",
             btnMentor: "Become a Mentor"
         },
@@ -334,7 +339,7 @@ window.I18N = {
             btn: "Apply as a Mentor"
         },
         partners: {
-            title: "Partners & Friends of the Center",
+            title: "Friends of NAUM",
             items: [
                 { name: "Faculty of Philosophy", color: "border-teal-200 text-teal-900 bg-teal-50/60" },
                 { name: "Ministry of Education", color: "border-rose-200 text-rose-900 bg-rose-50/60" },
@@ -431,9 +436,10 @@ window.I18N = {
             successMsg: "Thank you for your message! It has been logged and we will reply shortly."
         },
         footer: {
-            desc: "Institutional framework for supporting and advancing gifted children and youth at the Faculty of Philosophy, University of Banja Luka.",
+            desc: "Institutional framework for supporting and advancing gifted and talented children and youth at the Faculty of Philosophy, University of Banja Luka.",
             rights: "All rights reserved.",
             quickLinks: "Quick Links",
+            faq: "Frequently Asked Questions",
             contactInfo: "Contact Info",
             locationLine: "Banja Luka, Republic of Srpska"
         }
