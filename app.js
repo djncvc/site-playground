@@ -10,12 +10,22 @@ const NEWS_DATA = window.NEWS_DATA || [];
 const SOCIAL_LINKS = window.SOCIAL_LINKS || [];
 
 // --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (PROGRAMS) ---
+// --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (PROGRAMS) ---
 const formatProgramsFromCSV = (rows) => {
+    // Pametno prepoznavanje cjeline (i na srpskom i na engleskom)
+    const resolveSectionType = (val) => {
+        if (!val) return 'education';
+        const s = val.toLowerCase().trim();
+        if (s.includes('radionic') || s.includes('workshop')) return 'workshop';
+        if (s.includes('aktivnost') || s.includes('activity')) return 'activity';
+        return 'education';
+    };
+
     return rows
         .filter(r => (r.title_sr || r.title_lat || r.title_en))
         .map((r, index) => ({
             id: r.id ? parseInt(r.id, 10) : index + 1,
-            sectionType: (r.sectionType || 'education').toLowerCase().trim(),
+            sectionType: resolveSectionType(r.sectionType || r.kategorija || r.category),
             areaType: (r.areaType || 'logic').toLowerCase().trim(),
             ageGroup: (r.ageGroup || 'primary').toLowerCase().trim(),
             sr: {
