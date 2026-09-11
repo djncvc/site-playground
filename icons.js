@@ -1,6 +1,7 @@
 // icons.js
 const ICONS = {
     'chevron-right': <path d="m9 18 6-6-6-6" />,
+    'chevron-down': <path d="m6 9 6 6 6-6" />,
     'arrow-right': (
         <React.Fragment>
             <path d="M5 12h14" />
