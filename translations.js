@@ -135,7 +135,8 @@ window.I18N = {
             emailLabelForm: "Е-маил адреса",
             msgLabel: "Порука",
             msgPh: "Како вам можемо помоћи?...",
-            submitBtn: "Пошаљи поруку",
+            submitBtn: "Пошаљи поруку",            
+            socialTitle: "Пратите наш рад на мрежама",
             successMsg: "Хвала на поруци! Ваша порука је уредно забиљежена и одговорићемо убрзо."
         },
         footer: {
@@ -283,6 +284,7 @@ window.I18N = {
             msgLabel: "Poruka",
             msgPh: "Kako vam možemo pomoći?...",
             submitBtn: "Pošalji poruku",
+            socialTitle: "Pratite naš rad na mrežama",
             successMsg: "Hvala na poruci! Vaša poruka je uredno zabilježena i odgovorićemo ubrzo."
         },
         footer: {
@@ -430,6 +432,7 @@ window.I18N = {
             msgLabel: "Message",
             msgPh: "How can we help you?...",
             submitBtn: "Send Message",
+            socialTitle: "Follow Us Online",
             successMsg: "Thank you for your message! It has been logged and we will reply shortly."
         },
         footer: {

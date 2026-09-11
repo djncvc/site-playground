@@ -292,3 +292,42 @@ window.NEWS_DATA = [
         }
     }
 ];
+
+// Званични линкови Центра НАУМ (преузето са Linktree)
+window.SOCIAL_LINKS = [
+    {
+        id: "instagram",
+        name: "Instagram",
+        url: "https://instagram.com/naum_centar",
+        icon: "instagram",
+        color: "hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-purple-600 hover:text-white hover:border-transparent text-pink-600 bg-pink-50 border-pink-100"
+    },
+    {
+        id: "facebook",
+        name: "Facebook",
+        url: "https://www.facebook.com/profile.php?id=61576248009149",
+        icon: "facebook",
+        color: "hover:bg-blue-600 hover:text-white hover:border-blue-600 text-blue-600 bg-blue-50 border-blue-100"
+    },
+    {
+        id: "linkedin",
+        name: "LinkedIn",
+        url: "https://www.linkedin.com/company/107620789/",
+        icon: "linkedin",
+        color: "hover:bg-sky-700 hover:text-white hover:border-sky-700 text-sky-700 bg-sky-50 border-sky-100"
+    },
+    {
+        id: "youtube",
+        name: "YouTube",
+        url: "https://www.youtube.com/@NaumCentarzanadarenost",
+        icon: "youtube",
+        color: "hover:bg-red-600 hover:text-white hover:border-red-600 text-red-600 bg-red-50 border-red-100"
+    },
+    {
+        id: "viber",
+        name: "Viber заједница",
+        url: "https://invite.viber.com/?g2=AQAuJqt3WZONsFWNUyUDEX8xDnFQ89MYBkhceSHzIidX40dBpWQwwuSSuoC04%2B4s%20na%20Viberu",
+        icon: "viber",
+        color: "hover:bg-purple-600 hover:text-white hover:border-purple-600 text-purple-600 bg-purple-50 border-purple-100"
+    }
+];

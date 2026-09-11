@@ -7,6 +7,7 @@ const DEFAULT_PROGRAMS = window.DEFAULT_PROGRAMS || [];
 const DEFAULT_MENTORS = window.MENTORS_DATA || [];
 const PARTNERS_DATA = window.PARTNERS_DATA || [];
 const NEWS_DATA = window.NEWS_DATA || [];
+const SOCIAL_LINKS = window.SOCIAL_LINKS || [];
 
 // --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (PROGRAMS) ---
 const formatProgramsFromCSV = (rows) => {
@@ -1066,6 +1067,26 @@ function App() {
                                     <p className="text-slate-600 text-sm">+387 51 322 780</p>
                                 </div>
                             </div>
+                            {/* Social Media Links */}
+                            <div className="pt-6 border-t border-slate-200">
+                                <h4 className="font-bold text-slate-900 text-sm mb-3">
+                                    {t?.contactView?.socialTitle || "Пратите нас на друштвеним мрежама"}
+                                </h4>
+                                <div className="flex flex-wrap gap-2.5">
+                                    {SOCIAL_LINKS.map(item => (
+                                        <a 
+                                            key={item.id}
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all shadow-sm ${item.color}`}
+                                        >
+                                            <Icon name={item.icon} className="w-4 h-4" />
+                                            <span>{item.name}</span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -1281,6 +1302,20 @@ function App() {
                         <p className="max-w-md text-sm text-slate-400 leading-relaxed mb-6">
                             {t?.footer?.desc || "Институционални оквир за подршку и развој надарене и талентоване дјеце и младих..."}
                         </p>
+                                    <div className="flex gap-3 mb-6">
+                                        {SOCIAL_LINKS.map(item => (
+                                            <a 
+                                                key={item.id}
+                                                href={item.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                title={item.name}
+                                                className="w-9 h-9 bg-slate-800 text-slate-300 hover:text-white rounded-full hover:bg-teal-600 transition-all flex items-center justify-center"
+                                            >
+                                                <Icon name={item.icon} className="w-4 h-4" />
+                                            </a>
+                                        ))}
+                                    </div>
                         <p className="text-xs text-slate-500">
                             &copy; {new Date().getFullYear()} {t?.brandSub || "Центар за надареност НАУМ"}. {t?.footer?.rights || "Сва права задржана."}
                         </p>
