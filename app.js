@@ -501,7 +501,7 @@ function App() {
                     <div className="relative px-6 py-20 md:py-28 flex flex-col items-center text-center max-w-4xl mx-auto z-10">
                         <span className="inline-flex items-center gap-2 bg-white/10 text-slate-200 border border-white/15 px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold mb-6 backdrop-blur-md">
                             <Icon name="sparkles" className="w-4 h-4 text-amber-400" />
-                            {t?.hero?.badge || "Филозофски факултет Универзитета у Бањој Луци"}
+                            {t?.hero?.badge || "Центар за надареност НАУМ"}
                         </span>
 
                         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
@@ -1183,12 +1183,15 @@ function App() {
         <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
             <div className="h-1.5 w-full bg-gradient-to-r from-emerald-400 via-cyan-400 via-pink-500 to-amber-400"></div>
 
+            {/* --- HEADER --- */}
             <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-20">
-                        {/* Brand Logo & Clean Title */}
+                    {/* Added gap-4 lg:gap-8 to prevent squeezing */}
+                    <div className="flex justify-between items-center h-20 gap-4 lg:gap-8">
+                        
+                        {/* Brand Logo & Title — Added mr-4 lg:mr-8 for guaranteed breathing room */}
                         <div 
-                            className="flex items-center gap-3 cursor-pointer group" 
+                            className="flex items-center gap-3 cursor-pointer group flex-shrink-0 mr-4 lg:mr-8" 
                             onClick={() => navigateTo('home')}
                         >
                             <img 
@@ -1196,34 +1199,54 @@ function App() {
                                 alt="НАУМ Лого" 
                                 className="h-11 md:h-12 w-auto object-contain transition-transform group-hover:scale-105" 
                             />
-                            <div className="hidden sm:block leading-tight text-xs md:text-sm font-semibold text-slate-700 uppercase tracking-normal border-l pl-3 border-slate-200">
-                                {t?.brandSub || "Центар за надареност НАУМ"}
+                            <div className="hidden sm:flex flex-col justify-center border-l pl-3 border-slate-200 text-left">
+                                <span className="text-xs md:text-sm font-bold text-slate-800 uppercase tracking-tight leading-tight whitespace-nowrap">
+                                    {t?.facultyLine1 || "Филозофски факултет"}
+                                </span>
+                                <span className="text-[11px] md:text-xs font-semibold text-teal-700 leading-tight whitespace-nowrap">
+                                    {t?.facultyLine2 || "Универзитет у Бањој Луци"}
+                                </span>
                             </div>
                         </div>
 
-                        {/* Desktop Navigation with Dropdowns */}
-                        <nav className="hidden lg:flex items-center space-x-1">
-                            <button onClick={() => navigateTo('home')} className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${currentPage === 'home' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-teal-700'}`}>
+                        {/* Desktop Navigation with Dropdowns — Optimized padding so it never crowds the logo */}
+                        <nav className="hidden lg:flex items-center space-x-0.5 xl:space-x-1 ml-auto">
+                            <button 
+                                onClick={() => navigateTo('home')} 
+                                className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all ${
+                                    currentPage === 'home' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-teal-700'
+                                }`}
+                            >
                                 {t?.nav?.home || "Почетна"}
                             </button>
-                            <button onClick={() => navigateTo('about')} className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${currentPage === 'about' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-teal-700'}`}>
+                            <button 
+                                onClick={() => navigateTo('about')} 
+                                className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all ${
+                                    currentPage === 'about' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-teal-700'
+                                }`}
+                            >
                                 {t?.nav?.about || "О нама"}
                             </button>
 
                             {/* Dropdown 1: Програми */}
                             <div className="relative" onMouseEnter={() => setActiveDropdown('programs')} onMouseLeave={() => setActiveDropdown(null)}>
-                                <button onClick={() => navigateTo('programs')} className={`px-3 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1 ${currentPage === 'programs' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-teal-700'}`}>
-                                    {t?.nav?.programs || "Програми"} <Icon name="chevron-down" className="w-4 h-4 opacity-70" />
+                                <button 
+                                    onClick={() => navigateTo('programs')} 
+                                    className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all flex items-center gap-1 ${
+                                        currentPage === 'programs' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-teal-700'
+                                    }`}
+                                >
+                                    {t?.nav?.programs || "Програми"} <Icon name="chevron-down" className="w-3.5 h-3.5 opacity-70" />
                                 </button>
                                 {activeDropdown === 'programs' && (
-                                    <div className="absolute left-0 mt-1 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50">
-                                        <button onClick={() => navigateTo('programs-education')} className="block w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-700">
+                                    <div className="absolute left-0 mt-1 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in duration-150">
+                                        <button onClick={() => navigateTo('programs-education')} className="block w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-700">
                                             {t?.nav?.programsSub?.education || "Образовни програми"}
                                         </button>
-                                        <button onClick={() => navigateTo('programs-workshop')} className="block w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
+                                        <button onClick={() => navigateTo('programs-workshop')} className="block w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
                                             {t?.nav?.programsSub?.workshops || "Радионице"}
                                         </button>
-                                        <button onClick={() => navigateTo('programs-activity')} className="block w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700">
+                                        <button onClick={() => navigateTo('programs-activity')} className="block w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700">
                                             {t?.nav?.programsSub?.activities || "Активности"}
                                         </button>
                                     </div>
@@ -1232,15 +1255,20 @@ function App() {
 
                             {/* Dropdown 2: Ментори */}
                             <div className="relative" onMouseEnter={() => setActiveDropdown('mentors')} onMouseLeave={() => setActiveDropdown(null)}>
-                                <button onClick={() => navigateTo('mentors')} className={`px-3 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1 ${currentPage === 'mentors' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-teal-700'}`}>
-                                    {t?.nav?.mentors || "Ментори"} <Icon name="chevron-down" className="w-4 h-4 opacity-70" />
+                                <button 
+                                    onClick={() => navigateTo('mentors')} 
+                                    className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all flex items-center gap-1 ${
+                                        currentPage === 'mentors' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-teal-700'
+                                    }`}
+                                >
+                                    {t?.nav?.mentors || "Ментори"} <Icon name="chevron-down" className="w-3.5 h-3.5 opacity-70" />
                                 </button>
                                 {activeDropdown === 'mentors' && (
-                                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50">
-                                        <button onClick={() => navigateTo('mentors-our')} className="block w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-700">
+                                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in duration-150">
+                                        <button onClick={() => navigateTo('mentors-our')} className="block w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-700">
                                             {t?.nav?.mentorsSub?.ourMentors || "Наши ментори"}
                                         </button>
-                                        <button onClick={() => navigateTo('mentors-apply')} className="block w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
+                                        <button onClick={() => navigateTo('mentors-apply')} className="block w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
                                             {t?.nav?.mentorsSub?.applyMentor || "Пријава за менторе"}
                                         </button>
                                     </div>
@@ -1249,36 +1277,54 @@ function App() {
 
                             {/* Dropdown 3: Пријатељи НАУМ-а */}
                             <div className="relative" onMouseEnter={() => setActiveDropdown('friends')} onMouseLeave={() => setActiveDropdown(null)}>
-                                <button onClick={() => navigateTo('friends-list')} className="px-3 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1 text-slate-600 hover:text-teal-700">
-                                    {t?.nav?.friends || "Пријатељи НАУМ-а"} <Icon name="chevron-down" className="w-4 h-4 opacity-70" />
+                                <button 
+                                    onClick={() => navigateTo('friends-list')} 
+                                    className="px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all flex items-center gap-1 text-slate-600 hover:text-teal-700"
+                                >
+                                    {t?.nav?.friends || "Пријатељи НАУМ-а"} <Icon name="chevron-down" className="w-3.5 h-3.5 opacity-70" />
                                 </button>
                                 {activeDropdown === 'friends' && (
-                                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50">
-                                        <button onClick={() => navigateTo('friends-list')} className="block w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-700">
+                                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in duration-150">
+                                        <button onClick={() => navigateTo('friends-list')} className="block w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-700">
                                             {t?.nav?.friendsSub?.list || "Пријатељи Центра"}
                                         </button>
-                                        <button onClick={() => navigateTo('friends-support')} className="block w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
+                                        <button onClick={() => navigateTo('friends-support')} className="block w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-pink-50 hover:text-pink-700">
                                             {t?.nav?.friendsSub?.support || "Подржи рад Центра"}
                                         </button>
                                     </div>
                                 )}
                             </div>
 
-                            <button onClick={() => navigateTo('apply')} className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${currentPage === 'apply' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-teal-700'}`}>
+                            <button 
+                                onClick={() => navigateTo('apply')} 
+                                className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all ${
+                                    currentPage === 'apply' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-teal-700'
+                                }`}
+                            >
                                 {t?.nav?.apply || "Пријаве"}
                             </button>
-                            <button onClick={() => navigateTo('news')} className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${currentPage === 'news' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-teal-700'}`}>
+                            <button 
+                                onClick={() => navigateTo('news')} 
+                                className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all ${
+                                    currentPage === 'news' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-teal-700'
+                                }`}
+                            >
                                 {t?.nav?.news || "Вијести"}
                             </button>
-                            <button onClick={() => navigateTo('contact')} className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${currentPage === 'contact' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-teal-700'}`}>
+                            <button 
+                                onClick={() => navigateTo('contact')} 
+                                className={`px-2.5 xl:px-3 py-1.5 xl:py-2 rounded-full text-xs xl:text-sm font-medium transition-all ${
+                                    currentPage === 'contact' ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:text-teal-700'
+                                }`}
+                            >
                                 {t?.nav?.contact || "Контакт"}
                             </button>
 
-                            <div className="ml-2 mr-2">
+                            <div className="ml-1 xl:ml-2 mr-1 xl:mr-2">
                                 <LanguageSelector currentLang={lang} onSelectLang={setLang} />
                             </div>
 
-                            <Button variant="accent" onClick={() => navigateTo('apply')} className="text-xs py-2 px-4 ml-1">
+                            <Button variant="accent" onClick={() => navigateTo('apply')} className="text-xs py-1.5 xl:py-2 px-3.5 xl:px-4 ml-1">
                                 {t?.nav?.enrollBtn || "Упис полазника"}
                             </Button>
                         </nav>

@@ -2,6 +2,8 @@
 window.I18N = {
     sr: {
         brandSub: "Центар за надареност НАУМ",
+        facultyLine1: "Филозофски факултет",
+        facultyLine2: "Универзитет у Бањој Луци",
         facultySub: "Филозофски факултет Универзитета у Бањој Луци",
         submitting: "Слање података...",
         closedNotice: "Хвала на интересовању, пријаве су тренутно затворене.",
@@ -31,7 +33,7 @@ window.I18N = {
             enrollBtn: "Упис полазника"
         },
         hero: {
-            badge: "Филозофски факултет Универзитета у Бањој Луци",
+            badge: "Центар за надареност НАУМ",
             title1: "Откривамо и развијамо",
             title2: "таленте будућности",
             desc: "НАУМ је мјесто гдје радозналост сусреће знање. Повезујемо надарену и талентовану дјецу и младе, посвећене менторе и савремене научне методе.",
@@ -162,6 +164,8 @@ window.I18N = {
     },
     lat: {
         brandSub: "Centar za nadarenost NAUM",
+        facultyLine1: "Filozofski fakultet",
+        facultyLine2: "Univerzitet u Banjoj Luci",
         facultySub: "Filozofski fakultet Univerziteta u Banjoj Luci",
         submitting: "Slanje podataka...",
         closedNotice: "Hvala na interesovanju, prijave su trenutno zatvorene.",
@@ -191,7 +195,7 @@ window.I18N = {
             enrollBtn: "Upis polaznika"
         },
         hero: {
-            badge: "Filozofski fakultet Univerziteta u Banjoj Luci",
+            badge: "Centar za nadarenost NAUM",
             title1: "Otkrivamo i razvijamo",
             title2: "talente budućnosti",
             desc: "NAUM je mjesto gdje radoznalost susreće znanje. Povezujemo nadarenu i talentovanu djecu i mlade, posvećene mentore i savremene naučne metode.",
@@ -322,6 +326,8 @@ window.I18N = {
     },
     en: {
         brandSub: "Center for Giftedness NAUM",
+        facultyLine1: "Faculty of Philosophy",
+        facultyLine2: "University of Banja Luka",
         facultySub: "Faculty of Philosophy, University of Banja Luka",
         submitting: "Submitting...",
         closedNotice: "Thank you for your interest. Applications for this program are currently closed.",
@@ -351,7 +357,7 @@ window.I18N = {
             enrollBtn: "Enroll Now"
         },
         hero: {
-            badge: "Faculty of Philosophy, University of Banja Luka",
+            badge: "Center for Giftedness NAUM",
             title1: "Discovering and nurturing",
             title2: "talents of the future",
             desc: "NAUM is a place where curiosity meets knowledge. We connect gifted and talented children and youth, dedicated mentors, and modern scientific approaches.",
