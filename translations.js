@@ -43,6 +43,18 @@ window.I18N = {
             title: "Наша Мисија",
             desc: "Центар за надареност НАУМ, при Филозофском факултету Универзитета у Бањој Луци, посвећен је системској идентификацији, психолошкој подршци и креативном развоју даровите дјеце и омладине."
         },
+        about: {
+            tag: "Упознајте НАУМ",
+            title: "О Центру за надареност",
+            lead: "Центар за надареност НАУМ представља институционални простор развоја, истраживања и промоције потенцијала даровите дјеце и младих при Филозофском факултету Универзитета у Бањој Луци.",
+            missionTitle: "Наша Мисија",
+            missionText: "Системско препознавање, континуирано праћење и подстицање даровитих појединаца кроз индивидуализоване менторске програме и сарадњу са породицом, школом и широм заједницом.",
+            visionTitle: "Наша Визија",
+            visionText: "Друштво у којем свако дијете има прилику да развије сопствене аутентичне потенцијале, критичко мишљење и допринесе напретку заједнице кроз креативност и знање.",
+            howTitle: "Како радимо?",
+            howP1: "Наш интердисциплинарни тим чине универзитетски професори, психолози, педагози и ментори из праксе. Користимо стандардизоване процјене и специјализоване методичке приступе који подстичу аналитичко мишљење и истраживачки дух.",
+            howP2: "Вјерујемо да је таленат искрица коју треба његовати у подржавајућем, сигурном и интелектуално подстицајном окружењу."
+        },
         sections: {
             educationTitle: "Образовни програми",
             educationDesc: "Континуирани семестрални програми за развој академских потенцијала",
@@ -135,9 +147,9 @@ window.I18N = {
             emailLabelForm: "Е-маил адреса",
             msgLabel: "Порука",
             msgPh: "Како вам можемо помоћи?...",
-            submitBtn: "Пошаљи поруку",            
-            socialTitle: "Пратите наш рад на мрежама",
-            successMsg: "Хвала на поруци! Ваша порука је уредно забиљежена и одговорићемо убрзо."
+            submitBtn: "Пошаљи поруку",
+            successMsg: "Хвала на поруци! Ваша порука је уредно забиљежена и одговорићемо убрзо.",
+            socialTitle: "Пратите наш рад на мрежама"
         },
         footer: {
             desc: "Институционални оквир за подршку и развој надарене и талентоване дјеце и младих при Филозофском факултету Универзитета у Бањој Луци.",
@@ -190,6 +202,18 @@ window.I18N = {
             tag: "Ko smo mi",
             title: "Naša Misija",
             desc: "Centar za nadarenost NAUM, pri Filozofskom fakultetu Univerziteta u Banjoj Luci, posvećen je sistemskoj identifikaciji, psihološkoj podršci i kreativnom razvoju darovite djece i omladine."
+        },
+        about: {
+            tag: "Upoznajte NAUM",
+            title: "O Centru za nadarenost",
+            lead: "Centar za nadarenost NAUM predstavlja institucionalni prostor razvoja, istraživanja i promocije potencijala darovite djece i mladih pri Filozofskom fakultetu Univerziteta u Banjoj Luci.",
+            missionTitle: "Naša Misija",
+            missionText: "Sistemsko prepoznavanje, kontinuirano praćenje i podsticanje darovitih pojedinaca kroz individualizovane mentorske programe i saradnju sa porodicom, školom i širom zajednicom.",
+            visionTitle: "Naša Vizija",
+            visionText: "Društvo u kojem svako dijete ima priliku da razvije sopstvene autentične potencijale, kritičko mišljenje i doprinese napretku zajednice kroz kreativnost i znanje.",
+            howTitle: "Kako radimo?",
+            howP1: "Naš interdisciplinarni tim čine univerzitetski profesori, psiholozi, pedagozi i mentori iz prakse. Koristimo standardizovane procjene i specijalizovane metodičke pristupe koji podstiču analitičko mišljenje i istraživački duh.",
+            howP2: "Vjerujemo da je talenat iskrica koju treba njegovati u podržavajućem, sigurnom i intelektualno podsticajnom okruženju."
         },
         sections: {
             educationTitle: "Obrazovni programi",
@@ -284,8 +308,8 @@ window.I18N = {
             msgLabel: "Poruka",
             msgPh: "Kako vam možemo pomoći?...",
             submitBtn: "Pošalji poruku",
-            socialTitle: "Pratite naš rad na mrežama",
-            successMsg: "Hvala na poruci! Vaša poruka je uredno zabilježena i odgovorićemo ubrzo."
+            successMsg: "Hvala na poruci! Vaša poruka je uredno zabilježena i odgovorićemo ubrzo.",
+            socialTitle: "Pratite naš rad na mrežama"
         },
         footer: {
             desc: "Institucionalni okvir za podršku i razvoj nadarene i talentovane djece i mladih pri Filozofskom fakultetu Univerziteta u Banjoj Luci.",
@@ -338,6 +362,18 @@ window.I18N = {
             tag: "Who We Are",
             title: "Our Mission",
             desc: "The NAUM Center for Giftedness, within the Faculty of Philosophy at the University of Banja Luka, is committed to the systematic identification, psychological support, and creative development of gifted youth."
+        },
+        about: {
+            tag: "Meet NAUM",
+            title: "About the Center for Giftedness",
+            lead: "The NAUM Center for Giftedness serves as an institutional framework for the development, research, and advancement of gifted youth at the Faculty of Philosophy, University of Banja Luka.",
+            missionTitle: "Our Mission",
+            missionText: "Systematic identification, ongoing monitoring, and encouragement of gifted individuals through tailored mentorship programs and close collaboration with families, schools, and the wider community.",
+            visionTitle: "Our Vision",
+            visionText: "A society where every young person is empowered to fulfill their authentic potential, cultivate critical thinking, and contribute to the community through creativity and excellence.",
+            howTitle: "How We Work",
+            howP1: "Our interdisciplinary team includes university professors, psychologists, educators, and field specialists. We employ standardized assessments and advanced pedagogical methods that inspire analytical inquiry and creative innovation.",
+            howP2: "We believe giftedness is a spark that flourishes when nurtured within a supportive, safe, and intellectually vibrant environment."
         },
         sections: {
             educationTitle: "Educational Programs",
@@ -432,8 +468,8 @@ window.I18N = {
             msgLabel: "Message",
             msgPh: "How can we help you?...",
             submitBtn: "Send Message",
-            socialTitle: "Follow Us Online",
-            successMsg: "Thank you for your message! It has been logged and we will reply shortly."
+            successMsg: "Thank you for your message! It has been logged and we will reply shortly.",
+            socialTitle: "Follow Us Online"
         },
         footer: {
             desc: "Institutional framework for supporting and advancing gifted and talented children and youth at the Faculty of Philosophy, University of Banja Luka.",
