@@ -178,22 +178,45 @@ const LanguageSelector = ({ currentLang, onSelectLang }) => {
     );
 };
 
+const getPageFromHash = () => {
+    const hash = window.location.hash.replace('#', '').trim();
+    const validPages = ['home', 'about', 'programs', 'mentors', 'apply', 'news', 'contact'];
+    return validPages.includes(hash) ? hash : 'home';
+};
+
 // --- MAIN APP COMPONENT ---
 function App() {
     const [lang, setLang] = useState(() => localStorage.getItem('naum_lang') || 'sr');
-    const [currentPage, setCurrentPage] = useState('home');
+    
+    // Čita stranicu iz URL-a (npr. ako neko otvori sajt sa #programs ili klikne Back)
+    const [currentPage, setCurrentPage] = useState(getPageFromHash);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeSectionType, setActiveSectionType] = useState('all');
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [selectedProgramForApply, setSelectedProgramForApply] = useState(null);
 
-    // Dynamic State for Programs & Mentors
     const [programs, setPrograms] = useState(DEFAULT_PROGRAMS);
     const [isProgramsLoading, setIsProgramsLoading] = useState(false);
-
     const [mentors, setMentors] = useState(DEFAULT_MENTORS);
 
     const t = (window.I18N && window.I18N[lang]) ? window.I18N[lang] : (window.I18N ? window.I18N['sr'] : {});
+
+    // 🔄 Osluškivanje strelica pretraživača ("Back" i "Forward")
+    useEffect(() => {
+        const handleBrowserNavigation = () => {
+            const page = getPageFromHash();
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.addEventListener('popstate', handleBrowserNavigation);
+        window.addEventListener('hashchange', handleBrowserNavigation);
+
+        return () => {
+            window.removeEventListener('popstate', handleBrowserNavigation);
+            window.removeEventListener('hashchange', handleBrowserNavigation);
+        };
+    }, []);
 
     useEffect(() => {
         document.documentElement.lang = lang === 'en' ? 'en' : 'sr';
@@ -258,25 +281,32 @@ function App() {
         setActiveDropdown(null);
         setIsMenuOpen(false);
 
+        // Podkategorije u programima
         if (pageId === 'programs-education') {
+            window.location.hash = 'programs';
             setCurrentPage('programs');
             setActiveSectionType('education');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
         if (pageId === 'programs-workshop') {
+            window.location.hash = 'programs';
             setCurrentPage('programs');
             setActiveSectionType('workshop');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
         if (pageId === 'programs-activity') {
+            window.location.hash = 'programs';
             setCurrentPage('programs');
             setActiveSectionType('activity');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
+
+        // Sekcije kod mentora
         if (pageId === 'mentors-our') {
+            window.location.hash = 'mentors';
             setCurrentPage('mentors');
             setTimeout(() => {
                 const el = document.getElementById('our-mentors-section');
@@ -285,6 +315,7 @@ function App() {
             return;
         }
         if (pageId === 'mentors-apply') {
+            window.location.hash = 'mentors';
             setCurrentPage('mentors');
             setTimeout(() => {
                 const el = document.getElementById('mentor-form-section');
@@ -292,7 +323,10 @@ function App() {
             }, 100);
             return;
         }
+
+        // Prijatelji i podrška
         if (pageId === 'friends-list') {
+            window.location.hash = 'home';
             setCurrentPage('home');
             setTimeout(() => {
                 const el = document.getElementById('partners-section');
@@ -301,6 +335,7 @@ function App() {
             return;
         }
         if (pageId === 'friends-support') {
+            window.location.hash = 'home';
             setCurrentPage('home');
             setTimeout(() => {
                 const el = document.getElementById('support-section');
@@ -308,7 +343,10 @@ function App() {
             }, 100);
             return;
         }
+
+        // FAQ sekcija
         if (pageId === 'faq') {
+            window.location.hash = 'apply';
             setCurrentPage('apply');
             setTimeout(() => {
                 const el = document.getElementById('faq-section');
@@ -317,6 +355,10 @@ function App() {
             return;
         }
 
+        // Standardna navigacija kroz stranice
+        if (window.location.hash !== '#' + pageId) {
+            window.location.hash = pageId;
+        }
         setCurrentPage(pageId);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
