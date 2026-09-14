@@ -343,5 +343,31 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
         await expect(submitBtn).toBeDisabled();
         await expect(submitBtn).toHaveText(/У припреми/);
     });
+    // -------------------------------------------------------------
+    // 14. FOOTER ADDRESS TRANSLATION
+    // -------------------------------------------------------------
+    test('16. Footer address translates correctly into Latinica and English', async ({ page }) => {
+        await page.goto('/#home');
+        const footer = page.locator('footer');
+
+        // 1. Podrazumijevano: Ćirilica
+        await expect(footer).toContainText('Булевар војводе Петра Бојовића 1А');
+        await expect(footer).toContainText('Република Српска');
+
+        // 2. Prebacivanje na Latinicu (LAT)
+        await page.click('button[title="Latinica"]');
+        await expect(footer).toContainText('Bulevar vojvode Petra Bojovića 1A');
+        await expect(footer).toContainText('Republika Srpska');
+        await expect(footer).not.toContainText('Булевар');
+
+        // 3. Prebacivanje na Engleski (ENG)
+        await page.click('button[title="English"]');
+        await expect(footer).toContainText('Bulevar vojvode Petra Bojovica 1A');
+        await expect(footer).toContainText('Republic of Srpska');
+
+        // 4. Vraćanje na Ćirilicu
+        await page.click('button[title="Ћирилица"]');
+        await expect(footer).toContainText('Булевар војводе Петра Бојовића 1А');
+    });
 
 });

@@ -1545,7 +1545,7 @@ function App() {
                         <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">{t?.footer?.contactInfo || "Контакт инфо"}</h4>
                         <ul className="space-y-2.5 text-sm text-slate-400">
                             <li>{t?.facultySub || "Филозофски факултет Универзитета у Бањој Луци"}</li>
-                            <li>Булевар војводе Петра Бојовића 1А</li>
+                            <li>{t?.footer?.addressLine || "Булевар војводе Петра Бојовића 1А"}</li>
                             <li>78000 {t?.footer?.locationLine || "Бања Лука, Република Српска"}</li>
                             <li>
                                 <a href="mailto:naum@ff.unibl.org" className="text-teal-400 hover:underline">

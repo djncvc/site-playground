@@ -171,6 +171,7 @@ window.I18N = {
             quickLinks: "Брзи линкови",
             faq: "Често постављана питања",
             contactInfo: "Контакт инфо",
+            addressLine: "Булевар војводе Петра Бојовића 1А",
             locationLine: "Бања Лука, Република Српска"
         }
     },
@@ -345,6 +346,7 @@ window.I18N = {
             quickLinks: "Brzi linkovi",
             faq: "Često postavljana pitanja",
             contactInfo: "Kontakt info",
+            addressLine: "Bulevar vojvode Petra Bojovića 1A",
             locationLine: "Banja Luka, Republika Srpska"
         }
     },
@@ -519,6 +521,7 @@ window.I18N = {
             quickLinks: "Quick Links",
             faq: "Frequently Asked Questions",
             contactInfo: "Contact Info",
+            addressLine: "Bulevar vojvode Petra Bojovica 1A",
             locationLine: "Banja Luka, Republic of Srpska"
         }
     }
