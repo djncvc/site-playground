@@ -262,20 +262,40 @@ function App() {
     }, []);
 
     const isClosedStatus = (statusStr) => {
-        if (!statusStr) return false;
-        const s = statusStr.toLowerCase();
-        return s.includes('попуњено') || s.includes('popunjeno') || s.includes('затворено') || s.includes('zatvoreno') || s.includes('closed') || s.includes('full');
-    };
+            if (!statusStr) return false;
+            const s = statusStr.toLowerCase();
+            return s.includes('попуњено') || s.includes('popunjeno') || s.includes('затворено') || s.includes('zatvoreno') || s.includes('closed') || s.includes('full');
+        };
+
+        const isInPrepStatus = (statusStr) => {
+            if (!statusStr) return false;
+            const s = statusStr.toLowerCase();
+            return s.includes('припрем') || s.includes('priprem') || s.includes('најав') || s.includes('najav') || s.includes('preparation') || s.includes('upcoming') || s.includes('soon');
+        };
+
+        const getStatusBadgeStyle = (statusStr) => {
+            if (isClosedStatus(statusStr)) {
+                return 'bg-rose-50 text-rose-600 border border-rose-200';
+            }
+            if (isInPrepStatus(statusStr)) {
+                return 'bg-amber-50 text-amber-700 border border-amber-200';
+            }
+            return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+        };
 
     const handleApplyClick = (program) => {
-        const pLang = program[lang] || program['sr'];
-        if (isClosedStatus(pLang.status)) {
-            alert(t?.closedNotice || "Пријаве су тренутно затворене.");
-            return;
-        }
-        setSelectedProgramForApply(`${pLang.title} (${pLang.age})`);
-        navigateTo('apply');
-    };
+            const pLang = program[lang] || program['sr'];
+            if (isClosedStatus(pLang.status)) {
+                alert(t?.closedNotice || "Пријаве су тренутно затворене.");
+                return;
+            }
+            if (isInPrepStatus(pLang.status)) {
+                alert(t?.inPrepNotice || "Овај садржај је тренутно у припреми. Пријаве ће бити отворене ускоро.");
+                return;
+            }
+            setSelectedProgramForApply(`${pLang.title} (${pLang.age})`);
+            navigateTo('apply');
+        };
 
     const navigateTo = (pageId) => {
         setActiveDropdown(null);
@@ -374,6 +394,7 @@ function App() {
             {items.map(program => {
                 const p = program[lang] || program['sr'];
                 const closed = isClosedStatus(p.status);
+                const inPrep = isInPrepStatus(p.status);
                 return (
                     <Card key={program.id} className="flex flex-col h-full hover:border-teal-300 transition-all group">
                         <div className="flex justify-between items-start mb-4">
@@ -391,15 +412,17 @@ function App() {
                             {p.description}
                         </p>
                         <div className="flex justify-between items-center mt-auto border-t border-slate-100 pt-4">
-                            <span className={`text-xs font-bold px-2 py-1 rounded ${
-                                closed ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-700'
-                            }`}>
+                            <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusBadgeStyle(p.status)}`}>
                                 {p.status}
                             </span>
                             
                             {closed ? (
                                 <span className="text-xs text-slate-400 font-semibold italic cursor-not-allowed">
                                     {t?.sections?.closedBtn || "Пријаве затворене"}
+                                </span>
+                            ) : inPrep ? (
+                                <span className="text-xs text-amber-700 font-semibold italic cursor-not-allowed">
+                                    {t?.sections?.inPrepBtn || "У припреми"}
                                 </span>
                             ) : (
                                 <button 
@@ -847,6 +870,7 @@ function App() {
         );
     };
 
+    
     const ApplyView = () => {
         const defaultSelected = selectedProgramForApply || (programs[0] ? `${(programs[0][lang] || programs[0]['sr']).title} (${(programs[0][lang] || programs[0]['sr']).age})` : '');
         
@@ -867,12 +891,19 @@ function App() {
             const pLang = p[lang] || p['sr'];
             return `${pLang.title} (${pLang.age})` === form.programTitle;
         });
-        const isCurrentSelectionClosed = currentlySelectedProgramObj && isClosedStatus((currentlySelectedProgramObj[lang] || currentlySelectedProgramObj['sr']).status);
+        const currentStatus = (currentlySelectedProgramObj && (currentlySelectedProgramObj[lang] || currentlySelectedProgramObj['sr']).status) || '';
+        const isCurrentSelectionClosed = isClosedStatus(currentStatus);
+        const isCurrentSelectionInPrep = isInPrepStatus(currentStatus);
+        const cannotApply = isCurrentSelectionClosed || isCurrentSelectionInPrep;
 
         const handleSubmit = async (e) => {
             e.preventDefault();
             if (isCurrentSelectionClosed) {
-                alert(t?.closedNotice || "Пријаве су затворене.");
+                alert(t?.closedNotice || "Пријаве су тренутно затворене.");
+                return;
+            }
+            if (isCurrentSelectionInPrep) {
+                alert(t?.inPrepNotice || "Овај садржај је тренутно у припреми. Пријаве ће бити отворене ускоро.");
                 return;
             }
 
@@ -925,24 +956,50 @@ function App() {
                         )}
                         
                         <form className="p-6 md:p-8 space-y-5" onSubmit={handleSubmit}>
+                            {/* 🛡️ Skriveno Honeypot polje za botove (Test 12) */}
                             <div style={{ display: 'none' }} aria-hidden="true">
-                                <input type="text" name="hp_trap" value={form.hp_trap} onChange={e => setForm({ ...form, hp_trap: e.target.value })} tabIndex="-1" autoComplete="off" />
+                                <input 
+                                    type="text" 
+                                    name="hp_trap" 
+                                    value={form.hp_trap} 
+                                    onChange={e => setForm({ ...form, hp_trap: e.target.value })} 
+                                    tabIndex="-1" 
+                                    autoComplete="off" 
+                                />
                             </div>
 
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">{t?.applyView?.childName || "Име"}</label>
-                                    <input type="text" value={form.childName} onChange={e => setForm({ ...form, childName: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" required />
+                                    <input 
+                                        type="text" 
+                                        value={form.childName} 
+                                        onChange={e => setForm({ ...form, childName: e.target.value })} 
+                                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" 
+                                        required 
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">{t?.applyView?.childSurname || "Презиме"}</label>
-                                    <input type="text" value={form.childSurname} onChange={e => setForm({ ...form, childSurname: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" required />
+                                    <input 
+                                        type="text" 
+                                        value={form.childSurname} 
+                                        onChange={e => setForm({ ...form, childSurname: e.target.value })} 
+                                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" 
+                                        required 
+                                    />
                                 </div>
                             </div>
 
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-1">{t?.applyView?.birthDate || "Датум рођења"}</label>
-                                <input type="date" value={form.birthDate} onChange={e => setForm({ ...form, birthDate: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm bg-white" required />
+                                <input 
+                                    type="date" 
+                                    value={form.birthDate} 
+                                    onChange={e => setForm({ ...form, birthDate: e.target.value })} 
+                                    className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm bg-white" 
+                                    required 
+                                />
                             </div>
 
                             <div>
@@ -955,18 +1012,28 @@ function App() {
                                     {programs.map(p => {
                                         const item = p[lang] || p['sr'];
                                         const closed = isClosedStatus(item.status);
+                                        const inPrep = isInPrepStatus(item.status);
+                                        const tag = closed ? ` [${item.status}]` : inPrep ? ` [${item.status}]` : '';
                                         return (
                                             <option key={p.id} value={`${item.title} (${item.age})`}>
-                                                {item.title} — ({item.age}) {closed ? `[${item.status}]` : ''}
+                                                {item.title} — ({item.age}){tag}
                                             </option>
                                         );
                                     })}
                                 </select>
                             </div>
 
+                            {/* Upozorenje ako je zatvoreno */}
                             {isCurrentSelectionClosed && (
                                 <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center gap-2">
                                     <span>⚠️</span> {t?.closedNotice || "Пријаве за овај програм су тренутно затворене."}
+                                </div>
+                            )}
+
+                            {/* Obavještenje ako je u pripremi */}
+                            {isCurrentSelectionInPrep && (
+                                <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold flex items-center gap-2">
+                                    <span>ℹ️</span> {t?.inPrepNotice || "Овај садржај је тренутно у припреми. Пријаве ће бити отворене ускоро."}
                                 </div>
                             )}
 
@@ -975,30 +1042,56 @@ function App() {
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-semibold text-slate-700 mb-1">{t?.applyView?.parentName || "Име и Презиме"}</label>
-                                        <input type="text" value={form.parentName} onChange={e => setForm({ ...form, parentName: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" required />
+                                        <input 
+                                            type="text" 
+                                            value={form.parentName} 
+                                            onChange={e => setForm({ ...form, parentName: e.target.value })} 
+                                            className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" 
+                                            required 
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-semibold text-slate-700 mb-1">{t?.applyView?.parentPhone || "Телефон"}</label>
-                                        <input type="tel" value={form.parentPhone} onChange={e => setForm({ ...form, parentPhone: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" placeholder="+387..." required />
+                                        <input 
+                                            type="tel" 
+                                            value={form.parentPhone} 
+                                            onChange={e => setForm({ ...form, parentPhone: e.target.value })} 
+                                            className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" 
+                                            placeholder="+387..." 
+                                            required 
+                                        />
                                     </div>
                                 </div>
                                 <div className="mt-4">
                                     <label className="block text-sm font-semibold text-slate-700 mb-1">{t?.applyView?.parentEmail || "Е-маил"}</label>
-                                    <input type="email" value={form.parentEmail} onChange={e => setForm({ ...form, parentEmail: e.target.value })} className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" placeholder="parent@email.com" required />
+                                    <input 
+                                        type="email" 
+                                        value={form.parentEmail} 
+                                        onChange={e => setForm({ ...form, parentEmail: e.target.value })} 
+                                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-teal-500 outline-none text-sm" 
+                                        placeholder="parent@email.com" 
+                                        required 
+                                    />
                                 </div>
                             </div>
 
                             <Button 
-                                variant={isCurrentSelectionClosed ? "disabled" : "primary"} 
+                                variant={cannotApply ? "disabled" : "primary"} 
                                 type="submit" 
-                                disabled={isSubmitting || isCurrentSelectionClosed} 
+                                disabled={isSubmitting || cannotApply} 
                                 className="w-full mt-4"
                             >
-                                {isCurrentSelectionClosed ? (t?.sections?.closedBtn || "Пријаве затворене") : (isSubmitting ? (t?.submitting || "Слање...") : (t?.applyView?.submitBtn || "Пошаљи пријаву"))} <Icon name="arrow-right" className="w-4 h-4" />
+                                {isCurrentSelectionClosed 
+                                    ? (t?.sections?.closedBtn || "Пријаве затворене")
+                                    : isCurrentSelectionInPrep
+                                        ? (t?.sections?.inPrepBtn || "У припреми")
+                                        : (isSubmitting ? (t?.submitting || "Слање...") : (t?.applyView?.submitBtn || "Пошаљи пријаву"))}
+                                {!cannotApply && <Icon name="arrow-right" className="w-4 h-4" />}
                             </Button>
                         </form>
                     </div>
 
+                    {/* FAQ sekcija sa ID-jem za navigaciju (Test 14) */}
                     <div id="faq-section" className="mt-12 scroll-mt-24">
                         <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">{t?.applyView?.faqTitle || "Често постављана питања"}</h3>
                         <div className="space-y-3">

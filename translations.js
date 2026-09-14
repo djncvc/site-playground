@@ -153,6 +153,16 @@ window.I18N = {
             successMsg: "Хвала на поруци! Ваша порука је уредно забиљежена и одговорићемо убрзо.",
             socialTitle: "Пратите наш рад на мрежама"
         },
+        closedNotice: "Хвала на интересовању, пријаве су тренутно затворене.",
+        inPrepNotice: "Овај садржај је тренутно у припреми. Пријаве ће бити отворене ускоро.",
+        // unutar sections:
+        sections: {
+            // ...
+            applyBtn: "Пријави се",
+            closedBtn: "Пријаве затворене",
+            inPrepBtn: "У припреми",
+            allBtn: "Види све"
+        },
         footer: {
             desc: "Институционални оквир за подршку и развој надарене и талентоване дјеце и младих при Филозофском факултету Универзитета у Бањој Луци.",
             rights: "Сва права задржана.",
@@ -315,6 +325,16 @@ window.I18N = {
             successMsg: "Hvala na poruci! Vaša poruka je uredno zabilježena i odgovorićemo ubrzo.",
             socialTitle: "Pratite naš rad na mrežama"
         },
+        closedNotice: "Hvala na interesovanju, prijave su trenutno zatvorene.",
+        inPrepNotice: "Ovaj sadržaj je trenutno u pripremi. Prijave će biti otvorene uskoro.",
+        // unutar sections:
+        sections: {
+            // ...
+            applyBtn: "Prijavi se",
+            closedBtn: "Prijave zatvorene",
+            inPrepBtn: "U pripremi",
+            allBtn: "Vidi sve"
+        },
         footer: {
             desc: "Institucionalni okvir za podršku i razvoj nadarene i talentovane djece i mladih pri Filozofskom fakultetu Univerziteta u Banjoj Luci.",
             rights: "Sva prava zadržana.",
@@ -476,6 +496,16 @@ window.I18N = {
             submitBtn: "Send Message",
             successMsg: "Thank you for your message! It has been logged and we will reply shortly.",
             socialTitle: "Follow Us Online"
+        },
+        closedNotice: "Thank you for your interest. Applications for this program are currently closed.",
+        inPrepNotice: "This program is currently in preparation. Applications will open soon.",
+        // unutar sections:
+        sections: {
+            // ...
+            applyBtn: "Apply Now",
+            closedBtn: "Applications Closed",
+            inPrepBtn: "In preparation",
+            allBtn: "View All"
         },
         footer: {
             desc: "Institutional framework for supporting and advancing gifted and talented children and youth at the Faculty of Philosophy, University of Banja Luka.",

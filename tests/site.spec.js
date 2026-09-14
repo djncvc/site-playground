@@ -1,12 +1,11 @@
 // tests/site.spec.js
 const { test, expect } = require('@playwright/test');
 
-// Consistent mock CSV with categories and closed status matching DEFAULT_PROGRAMS
 const MOCK_PROGRAMS_CSV = `id,sectionType,ageGroup,areaType,title_sr,age_sr,area_sr,status_sr,desc_sr,title_lat,age_lat,area_lat,status_lat,desc_lat,title_en,age_en,area_en,status_en,desc_en
 1,education,primary,logic,Мала школа мишљења,Предшколски,Логика,Отворене пријаве,Опис,Mala škola mišljenja,Predškolski,Logika,Otvorene prijave,Opis,Little School,Preschool,Logic,Open,Description
 2,education,primary,stem,Млади математичари,Основна школа,STEM,Попуњено,Опис,Mladi matematičari,Osnovna škola,STEM,Popunjeno,Opis,Young Mathematicians,Primary School,STEM,Full / Closed,Description
 3,workshop,secondary,arts,Креативно писање и новинарство,Средња школа,Умјетност,Отворене пријаве,Опис,Kreativno pisanje,Srednja škola,Umjetnost,Otvorene prijave,Opis,Creative Writing,High School,Arts,Open,Description
-4,activity,primary,stem,Љетња научна школа,Основна школа,STEM,Отворене пријаве,Опис,Ljetnja naučna škola,Osnovna škola,STEM,Otvorene prijave,Opis,Summer School,Primary School,STEM,Open,Description`;
+4,activity,primary,stem,Љетња научна школа,Основна школа,STEM,У припреми,Опис,Ljetnja naučna škola,Osnovna škola,STEM,U pripremi,Opis,Summer School,Primary School,STEM,In preparation,Description`;
 
 test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
 
@@ -277,6 +276,39 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
 
         await expect(page).toHaveURL(/#apply/);
         await expect(page.locator('#faq-section')).toBeVisible();
+    });
+
+// -------------------------------------------------------------
+    // 13. "U PRIPREMI" STATUS SAFEGUARD
+    // -------------------------------------------------------------
+    test('15. Program marked as "U pripremi" disables apply button and shows info banner', async ({ page }) => {
+        const responsePromise = page.waitForResponse('**/*output=csv*').catch(() => {});
+        await page.goto('/#programs');
+        await responsePromise;
+
+        // 1. Provjera na tačnoj kartici programa: ima bedž i dugme "Пријави се" ne postoji
+        const inPrepCard = page.locator('.rounded-2xl', { hasText: 'Љетња научна школа' });
+        await expect(inPrepCard.locator('span:has-text("У припреми")').first()).toBeVisible();
+        await expect(inPrepCard.locator('button:has-text("Пријави се")')).toHaveCount(0);
+
+        // 2. Odlazak na formular za prijavu
+        await page.goto('/#apply');
+        const select = page.locator('select');
+
+        // Dinamički izaberi opciju koja ima oznaku [У припреми]
+        const inPrepOption = select.locator('option', { hasText: /У припреми/ });
+        await expect(inPrepOption).toBeAttached();
+        const value = await inPrepOption.getAttribute('value');
+        await select.selectOption(value);
+
+        // 3. Provjera da se pojavilo plavo obavještenje
+        const infoBanner = page.locator('text=Овај садржај је тренутно у припреми. Пријаве ће бити отворене ускоро.');
+        await expect(infoBanner).toBeVisible();
+
+        // 4. Provjera da je dugme zaključano (disabled) i nosi natpis "У припреми"
+        const submitBtn = page.locator('button[type="submit"]');
+        await expect(submitBtn).toBeDisabled();
+        await expect(submitBtn).toHaveText(/У припреми/);
     });
 
 });
