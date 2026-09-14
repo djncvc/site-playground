@@ -63,7 +63,7 @@ window.I18N = {
             workshopsTitle: "Радионице",
             workshopsDesc: "Тематске интерактивне радионице и практичан менторски рад",
             activitiesTitle: "Активности",
-            activitiesDesc: "Научни кампови, квизови, дебате и такмичарски сусрети",
+            activitiesDesc: "Научни кампови, стручна предавања, стручна усавршавања, промоције резултата програма",
             applyBtn: "Пријави се",
             closedBtn: "Пријаве затворене",
             allBtn: "Види све"
@@ -102,7 +102,9 @@ window.I18N = {
             successMsg: "Хвала вам на подршци! Наш координатор ће вас контактирати у најкраћем року."
         },
         partners: {
-            title: "Пријатељи НАУМ-а"
+            title: "Пријатељи НАУМ-а",
+            tagline: "Заједничка мисија. Заједничка подршка. Више прилика за таленте.",
+            desc: "Пријатељи НАУМ-а су појединци, компаније, институције и организације који препознају значај улагања у потенцијал надарене и талентоване дјеце и младих и са нама дијеле мисију стварања подстицајног окружења за њихов развој."
         },
         programsView: {
             tag: "Наша понуда",
@@ -235,7 +237,7 @@ window.I18N = {
             workshopsTitle: "Radionice",
             workshopsDesc: "Tematske interaktivne radionice i praktičan mentorski rad",
             activitiesTitle: "Aktivnosti",
-            activitiesDesc: "Naučni kampovi, kvizovi, debate i takmičarski susreti",
+            activitiesDesc: "Naučni kampovi, stručna predavanja, stručna usavršavanja, promocije rezultata programa",
             applyBtn: "Prijavi se",
             closedBtn: "Prijave zatvorene",
             allBtn: "Vidi sve"
@@ -274,7 +276,9 @@ window.I18N = {
             successMsg: "Hvala vam na podršci! Naš koordinator će vas kontaktirati u najkraćem roku."
         },
         partners: {
-            title: "Prijatelji NAUM-a"
+            title: "Prijatelji NAUM-a",
+            tagline: "Zajednička misija. Zajednička podrška. Više prilika za talente.",
+            desc: "Prijatelji NAUM-a su pojedinci, kompanije, institucije i organizacije koji prepoznaju značaj ulaganja u potencijal nadarene i talentovane djece i mladih i sa nama dijele misiju stvaranja podsticajnog okruženja za njihov razvoj."
         },
         programsView: {
             tag: "Naša ponuda",
@@ -407,7 +411,7 @@ window.I18N = {
             workshopsTitle: "Workshops",
             workshopsDesc: "Hands-on, theme-driven practical workshops and laboratory sessions",
             activitiesTitle: "Activities",
-            activitiesDesc: "Science camps, academic debates, quizzes, and competitions",
+            activitiesDesc: "Science camps, professional lectures, professional development, and program result showcases",
             applyBtn: "Apply Now",
             closedBtn: "Applications Closed",
             allBtn: "View All"
@@ -446,7 +450,9 @@ window.I18N = {
             successMsg: "Thank you for supporting our mission! Our team will contact you shortly."
         },
         partners: {
-            title: "Friends of NAUM"
+            title: "Friends of NAUM",
+            tagline: "Shared mission. Shared support. More opportunities for talent.",
+            desc: "Friends of NAUM are individuals, companies, institutions, and organizations that recognize the importance of investing in the potential of gifted and talented youth, sharing our mission of creating an inspiring environment for their growth."
         },
         programsView: {
             tag: "Our Offerings",

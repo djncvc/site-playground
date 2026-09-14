@@ -113,13 +113,24 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
     // -------------------------------------------------------------
     // 5. THE 3 OFFERING CATEGORIES (PROGRAMS / WORKSHOPS / ACTIVITIES)
     // -------------------------------------------------------------
-    test('5. Home page displays all 3 distinct sections with cards', async ({ page }) => {
-        await page.goto('/#home');
+    test('5. Home page displays all 3 distinct sections with updated descriptions', async ({ page }) => {
+            await page.goto('/#home');
 
-        await expect(page.locator('h2:has-text("Образовни програми")')).toBeVisible();
-        await expect(page.locator('h2:has-text("Радионице")')).toBeVisible();
-        await expect(page.locator('h2:has-text("Активности")')).toBeVisible();
-    });
+            // Provjera da se vide sva 3 naslova cjelina
+            await expect(page.locator('h2:has-text("Образовни програми")')).toBeVisible();
+            await expect(page.locator('h2:has-text("Радионице")')).toBeVisible();
+            await expect(page.locator('h2:has-text("Активности")')).toBeVisible();
+
+            // 1. Provjera novog opisa za "Активности"
+            const activitiesSection = page.locator('section:has(h2:has-text("Активности"))');
+            const activitiesDesc = activitiesSection.locator('p').first();
+            
+            await expect(activitiesDesc).toContainText('Научни кампови, стручна предавања, стручна усавршавања, промоције резултата програма');
+
+            // 2. Provjera da stari pojmovi više nisu prisutni
+            await expect(activitiesDesc).not.toContainText('такмичарски сусрети');
+            await expect(activitiesDesc).not.toContainText('квизови');
+        });
 
     test('6. Programs page filter tabs filter content accurately', async ({ page }) => {
         await page.goto('/#programs');
@@ -179,17 +190,39 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
         expect(count).toBeGreaterThanOrEqual(2);
     });
 
+// -------------------------------------------------------------
+    // 8. PARTNERS (PRIJATELJI NAUM-A) & SUPPORT FORM
     // -------------------------------------------------------------
-    // 8. PARTNERS ORDER & SUPPORT FORM
-    // -------------------------------------------------------------
-    test('9. Partners section displays Fondacija Kaća first, followed by Banja Luka and Bijeljina', async ({ page }) => {
+    test('9. Partners section displays new intro text and all 6 partners without roles', async ({ page }) => {
         await page.goto('/#home');
 
-        const partnerBoxes = page.locator('#partners-section span.font-extrabold');
-        
+        const partnersSection = page.locator('#partners-section');
+
+        // 1. Provjera uvodnog teksta (tagline i opis)
+        await expect(partnersSection.locator('h3')).toContainText('Заједничка мисија. Заједничка подршка. Више прилика за таленте.');
+        await expect(partnersSection.locator('p')).toContainText('Пријатељи НАУМ-а су појединци, компаније, институције и организације');
+
+        // 2. Provjera da ima tačno 6 kartica
+        const partnerBoxes = partnersSection.locator('span.font-extrabold');
+        await expect(partnerBoxes).toHaveCount(6);
+
+        // 3. Provjera tačnog redoslijeda i naziva partnera
+        // 1. Fondacija "Kaća" (mora biti prva)
         await expect(partnerBoxes.nth(0)).toContainText('Фондација "Каћа"');
+        // 2. Grad Banja Luka
         await expect(partnerBoxes.nth(1)).toContainText('Град Бања Лука');
+        // 3. Grad Bijeljina
         await expect(partnerBoxes.nth(2)).toContainText('Град Бијељина');
+        // 4. Društvo psihologa RS
+        await expect(partnerBoxes.nth(3)).toContainText('Друштво психолога Републике Српске');
+        // 5. Mensa BiH
+        await expect(partnerBoxes.nth(4)).toContainText('Менса БиХ');
+        // 6. Muzička škola Opus conmusica
+        await expect(partnerBoxes.nth(5)).toContainText('Музичка школа "Opus conmusica"');
+
+        // 4. Provjera da nema starih uloga/objašnjenja
+        await expect(partnersSection).not.toContainText('Главни покровитељ');
+        await expect(partnersSection).not.toContainText('Институционална подршка');
     });
 
     test('10. Support the Center ("Подржи рад Центра") form is operational', async ({ page }) => {

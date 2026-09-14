@@ -234,22 +234,43 @@ window.MENTORS_DATA = [
     }
 ];
 
-// 3. UPDATED PARTNERS (Fondacija "Kaća" first, City of Banja Luka, City of Bijeljina)
+// 3. PRIJATELJI NAUM-A (Fondacija Kaća 1., bez uloga, dodate nove institucije)
 window.PARTNERS_DATA = [
     { 
         name: "Фондација \"Каћа\"", 
-        role: "Главни покровитељ и партнер",
-        color: "border-pink-300 text-pink-900 bg-pink-50/80 shadow-sm ring-2 ring-pink-400/20" 
+        lat: "Fondacija \"Kaća\"",
+        en: "Foundation \"Kaća\"",
+        color: "border-pink-300 text-pink-900 bg-pink-50/90 shadow-sm ring-2 ring-pink-400/20" 
     },
     { 
         name: "Град Бања Лука", 
-        role: "Институционална подршка",
+        lat: "Grad Banja Luka",
+        en: "City of Banja Luka",
         color: "border-blue-200 text-blue-900 bg-blue-50/70" 
     },
     { 
         name: "Град Бијељина", 
-        role: "Партнерски град",
+        lat: "Grad Bijeljina",
+        en: "City of Bijeljina",
         color: "border-teal-200 text-teal-900 bg-teal-50/70" 
+    },
+    { 
+        name: "Друштво психолога Републике Српске", 
+        lat: "Društvo psihologa Republike Srpske",
+        en: "Association of Psychologists of the Republic of Srpska",
+        color: "border-indigo-200 text-indigo-900 bg-indigo-50/70" 
+    },
+    { 
+        name: "Менса БиХ", 
+        lat: "Mensa BiH",
+        en: "Mensa BiH",
+        color: "border-amber-200 text-amber-900 bg-amber-50/70" 
+    },
+    { 
+        name: "Музичка школа \"Opus conmusica\"", 
+        lat: "Muzička škola \"Opus conmusica\"",
+        en: "Music School \"Opus conmusica\"",
+        color: "border-rose-200 text-rose-900 bg-rose-50/70" 
     }
 ];
 

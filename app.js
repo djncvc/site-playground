@@ -601,7 +601,7 @@ function App() {
                                 Догађаји и сусрети
                             </span>
                             <h2 className="text-3xl font-bold text-slate-900 mt-3">{t?.sections?.activitiesTitle || "Активности"}</h2>
-                            <p className="text-slate-500 mt-1">{t?.sections?.activitiesDesc || "Научни кампови и турнири"}</p>
+                            <p className="text-slate-500 mt-1">{t?.sections?.activitiesDesc || "Научни кампови, стручна предавања, стручна усавршавања, промоције резултата програма"}</p>
                         </div>
                         <button onClick={() => navigateTo('programs-activity')} className="text-teal-700 font-bold hidden md:flex items-center gap-1 hover:gap-2 transition-all">
                             {t?.sections?.allBtn || "Види све"} <Icon name="chevron-right" className="w-5 h-5" />
@@ -637,22 +637,37 @@ function App() {
                     </div>
                 </Section>
 
-                {/* Partners Section (Fondacija Kaća first) */}
-                <Section id="partners-section" className="text-center pt-10 pb-6 scroll-mt-24">
+                {/* Partners Section (Prijatelji NAUM-a) */}
+                <Section id="partners-section" className="text-center pt-12 pb-6 scroll-mt-24">
                     <span className="text-xs font-bold uppercase tracking-widest text-pink-600 bg-pink-50 px-3 py-1 rounded-full border border-pink-200">
                         {t?.partners?.title || "Пријатељи НАУМ-а"}
                     </span>
-                    <h2 className="text-3xl font-extrabold text-slate-900 mt-3 mb-8">Они који вјерују у таленте</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                        {PARTNERS_DATA.map((partner, idx) => (
-                            <div 
-                                key={idx} 
-                                className={`h-24 rounded-2xl border flex flex-col items-center justify-center text-center p-4 transition-all hover:scale-105 shadow-sm ${partner.color}`}
-                            >
-                                <span className="font-extrabold text-base md:text-lg">{partner.name}</span>
-                                <span className="text-xs opacity-75 mt-1 font-medium">{partner.role}</span>
-                            </div>
-                        ))}
+                    
+                    {/* Motivacioni uvodni tekst */}
+                    <div className="max-w-3xl mx-auto mt-4 mb-10">
+                        <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 mb-3 leading-snug">
+                            {t?.partners?.tagline || "Заједничка мисија. Заједничка подршка. Више прилика за таленте."}
+                        </h3>
+                        <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+                            {t?.partners?.desc || "Пријатељи НАУМ-а су појединци, компаније, институције и организације који препознају значај улагања у потенцијал надарене и талентоване дјеце и младих и са нама дијеле мисију стварања подстицајног окружења за њихов развој."}
+                        </p>
+                    </div>
+
+                    {/* Čiste kartice partnera (samo nazivi, bez uloga) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+                        {PARTNERS_DATA.map((partner, idx) => {
+                            const partnerName = (lang === 'lat' ? partner.lat : lang === 'en' ? partner.en : partner.name) || partner.name;
+                            return (
+                                <div 
+                                    key={idx} 
+                                    className={`min-h-[88px] rounded-2xl border flex items-center justify-center text-center p-5 transition-all hover:scale-105 shadow-sm ${partner.color}`}
+                                >
+                                    <span className="font-extrabold text-base md:text-lg leading-snug">
+                                        {partnerName}
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </Section>
 
