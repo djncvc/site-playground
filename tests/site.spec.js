@@ -1,0 +1,282 @@
+// tests/site.spec.js
+const { test, expect } = require('@playwright/test');
+
+// Consistent mock CSV with categories and closed status matching DEFAULT_PROGRAMS
+const MOCK_PROGRAMS_CSV = `id,sectionType,ageGroup,areaType,title_sr,age_sr,area_sr,status_sr,desc_sr,title_lat,age_lat,area_lat,status_lat,desc_lat,title_en,age_en,area_en,status_en,desc_en
+1,education,primary,logic,Мала школа мишљења,Предшколски,Логика,Отворене пријаве,Опис,Mala škola mišljenja,Predškolski,Logika,Otvorene prijave,Opis,Little School,Preschool,Logic,Open,Description
+2,education,primary,stem,Млади математичари,Основна школа,STEM,Попуњено,Опис,Mladi matematičari,Osnovna škola,STEM,Popunjeno,Opis,Young Mathematicians,Primary School,STEM,Full / Closed,Description
+3,workshop,secondary,arts,Креативно писање и новинарство,Средња школа,Умјетност,Отворене пријаве,Опис,Kreativno pisanje,Srednja škola,Umjetnost,Otvorene prijave,Opis,Creative Writing,High School,Arts,Open,Description
+4,activity,primary,stem,Љетња научна школа,Основна школа,STEM,Отворене пријаве,Опис,Ljetnja naučna škola,Osnovna škola,STEM,Otvorene prijave,Opis,Summer School,Primary School,STEM,Open,Description`;
+
+test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
+
+    // Mock external Google Sheets CSV requests for speed (<300ms) and 100% offline reliability
+    test.beforeEach(async ({ page }) => {
+        await page.route('**/*output=csv*', route => {
+            route.fulfill({
+                status: 200,
+                contentType: 'text/csv',
+                body: MOCK_PROGRAMS_CSV
+            });
+        });
+    });
+
+    // -------------------------------------------------------------
+    // 1. CORE STABILITY & RUNTIME ERRORS
+    // -------------------------------------------------------------
+    test('1. Page loads with zero JavaScript runtime or console errors', async ({ page }) => {
+        const consoleErrors = [];
+        page.on('console', msg => {
+            if (msg.type() === 'error') consoleErrors.push(msg.text());
+        });
+        page.on('pageerror', err => consoleErrors.push(err.message));
+
+        await page.goto('/');
+        await page.waitForSelector('#root');
+
+        expect(consoleErrors).toEqual([]);
+    });
+
+    // -------------------------------------------------------------
+    // 2. BRANDING & HEADER LAYOUT
+    // -------------------------------------------------------------
+    test('2. Header branding and Hero badge text are properly configured', async ({ page }) => {
+        await page.goto('/');
+
+        const headerFacultyTitle = page.locator('header span:has-text("Филозофски факултет")');
+        await expect(headerFacultyTitle).toBeVisible();
+
+        const headerUniversitySubtitle = page.locator('header span:has-text("Универзитет у Бањој Луци")');
+        await expect(headerUniversitySubtitle).toBeVisible();
+
+        const heroBadge = page.locator('main span:has-text("Центар за надареност НАУМ")');
+        await expect(heroBadge.first()).toBeVisible();
+    });
+
+    // -------------------------------------------------------------
+    // 3. MULTILINGUAL & TRANSLATION COMPLETENESS
+    // -------------------------------------------------------------
+    test('3. Multilingual switcher translates "O nama" and persists in localStorage', async ({ page }) => {
+        await page.goto('/#about');
+
+        const leadText = await page.locator('main p').first().textContent();
+        expect(leadText.trim().length).toBeGreaterThan(30);
+
+        const missionText = page.locator('main p:has-text("Системско препознавање")');
+        await expect(missionText).toBeVisible();
+
+        // Switch to Latinica (LAT)
+        await page.click('button[title="Latinica"]');
+        const latLeadText = await page.locator('main p').first().textContent();
+        expect(latLeadText).toContain('Centar za nadarenost NAUM');
+        expect(latLeadText).toContain('Filozofskom fakultetu');
+
+        // Switch to English (ENG)
+        await page.click('button[title="English"]');
+        const engLeadText = await page.locator('main p').first().textContent();
+        expect(engLeadText).toContain('The NAUM Center for Giftedness');
+        expect(engLeadText).toContain('Faculty of Philosophy');
+
+        // Persistence check
+        await page.reload();
+        const reloadedText = await page.locator('main').textContent();
+        expect(reloadedText).toContain('About the Center for Giftedness');
+
+        // Reset to Cyrillic
+        await page.click('button[title="Ћирилица"]');
+    });
+
+    // -------------------------------------------------------------
+    // 4. BROWSER HISTORY & BACK/FORWARD NAVIGATION
+    // -------------------------------------------------------------
+    test('4. Browser Back and Forward arrows work smoothly via Hash Routing', async ({ page }) => {
+        await page.goto('/#home');
+
+        await page.click('header button:has-text("О нама")');
+        await expect(page).toHaveURL(/#about/);
+
+        await page.click('header button:has-text("Програми")');
+        await expect(page).toHaveURL(/#programs/);
+
+        await page.click('header button:has-text("Контакт")');
+        await expect(page).toHaveURL(/#contact/);
+
+        await page.goBack();
+        await expect(page).toHaveURL(/#programs/);
+
+        await page.goBack();
+        await expect(page).toHaveURL(/#about/);
+
+        await page.goForward();
+        await expect(page).toHaveURL(/#programs/);
+    });
+
+    // -------------------------------------------------------------
+    // 5. THE 3 OFFERING CATEGORIES (PROGRAMS / WORKSHOPS / ACTIVITIES)
+    // -------------------------------------------------------------
+    test('5. Home page displays all 3 distinct sections with cards', async ({ page }) => {
+        await page.goto('/#home');
+
+        await expect(page.locator('h2:has-text("Образовни програми")')).toBeVisible();
+        await expect(page.locator('h2:has-text("Радионице")')).toBeVisible();
+        await expect(page.locator('h2:has-text("Активности")')).toBeVisible();
+    });
+
+    test('6. Programs page filter tabs filter content accurately', async ({ page }) => {
+        await page.goto('/#programs');
+
+        // Target the filter button inside main (not header)
+        await page.locator('main button:has-text("Радионице")').click();
+        await expect(page.locator('h3:has-text("Креативно писање")')).toBeVisible();
+        await expect(page.locator('h3:has-text("Млади математичари")')).toBeHidden();
+
+        // Target Activities filter inside main
+        await page.locator('main button:has-text("Активности")').click();
+        await expect(page.locator('h3:has-text("Љетња научна школа")')).toBeVisible();
+        await expect(page.locator('h3:has-text("Креативно писање")')).toBeHidden();
+
+        // Target All filter
+        await page.locator('main button:has-text("Сви садржаји")').click();
+        await expect(page.locator('h3:has-text("Млади математичари")')).toBeVisible();
+        await expect(page.locator('h3:has-text("Креативно писање")')).toBeVisible();
+    });
+
+    // -------------------------------------------------------------
+    // 6. NAVBAR DROPDOWNS
+    // -------------------------------------------------------------
+    test('7. Header dropdown menus render and navigate properly', async ({ page }) => {
+        await page.goto('/#home');
+
+        // Hover over Programs dropdown in header
+        await page.hover('header button:has-text("Програми")');
+        const workshopsSubLink = page.locator('header button:has-text("Радионице")');
+        await expect(workshopsSubLink).toBeVisible();
+        await workshopsSubLink.click();
+
+        // Should land on programs with workshops displayed
+        await expect(page).toHaveURL(/#programs/);
+        await expect(page.locator('h3:has-text("Креативно писање")')).toBeVisible();
+
+        // Hover over Mentors dropdown
+        await page.hover('header button:has-text("Ментори")');
+        const applyMentorSubLink = page.locator('header button:has-text("Пријава за менторе")');
+        await expect(applyMentorSubLink).toBeVisible();
+        await applyMentorSubLink.click();
+
+        await expect(page).toHaveURL(/#mentors/);
+        await expect(page.locator('#mentor-form-section')).toBeVisible();
+    });
+
+    // -------------------------------------------------------------
+    // 7. OUR MENTORS SHOWCASE SECTION
+    // -------------------------------------------------------------
+    test('8. Mentors showcase section displays mentor cards with titles and bios', async ({ page }) => {
+        await page.goto('/#mentors');
+
+        await expect(page.locator('h1:has-text("Наши ментори")')).toBeVisible();
+
+        const mentorCards = page.locator('#our-mentors-section h3');
+        const count = await mentorCards.count();
+        expect(count).toBeGreaterThanOrEqual(2);
+    });
+
+    // -------------------------------------------------------------
+    // 8. PARTNERS ORDER & SUPPORT FORM
+    // -------------------------------------------------------------
+    test('9. Partners section displays Fondacija Kaća first, followed by Banja Luka and Bijeljina', async ({ page }) => {
+        await page.goto('/#home');
+
+        const partnerBoxes = page.locator('#partners-section span.font-extrabold');
+        
+        await expect(partnerBoxes.nth(0)).toContainText('Фондација "Каћа"');
+        await expect(partnerBoxes.nth(1)).toContainText('Град Бања Лука');
+        await expect(partnerBoxes.nth(2)).toContainText('Град Бијељина');
+    });
+
+    test('10. Support the Center ("Подржи рад Центра") form is operational', async ({ page }) => {
+        await page.goto('/#home');
+
+        const supportForm = page.locator('#support-section form');
+        await expect(supportForm).toBeVisible();
+
+        // Target VISIBLE inputs to ignore hidden honeypot
+        await expect(page.locator('#support-section input:visible').first()).toBeVisible();
+        await expect(page.locator('#support-section button[type="submit"]')).toHaveText(/Пошаљи/);
+    });
+
+    // -------------------------------------------------------------
+    // 9. CLOSED PROGRAM SAFEGUARD
+    // -------------------------------------------------------------
+    test('11. Closed program disables registration and triggers warning notice', async ({ page }) => {
+        // Wait for CSV response so data is stable before interacting
+        const responsePromise = page.waitForResponse('**/*output=csv*').catch(() => {});
+        await page.goto('/#apply');
+        await responsePromise;
+
+        const select = page.locator('select');
+        
+        // Dynamically select the option marked with [Попуњено]
+        const closedOption = select.locator('option', { hasText: /Попуњено/ });
+        await expect(closedOption).toBeAttached();
+        const value = await closedOption.getAttribute('value');
+        await select.selectOption(value);
+
+        // 1. Warning banner appears
+        const warning = page.locator('text=Хвала на интересовању, пријаве су тренутно затворене.');
+        await expect(warning).toBeVisible();
+
+        // 2. Submit button is locked and disabled
+        const submitBtn = page.locator('button[type="submit"]');
+        await expect(submitBtn).toBeDisabled();
+        await expect(submitBtn).toHaveText(/Пријаве затворене/);
+    });
+
+    // -------------------------------------------------------------
+    // 10. ANTI-BOT HONEYPOT FIELD
+    // -------------------------------------------------------------
+    test('12. Anti-bot honeypot fields are hidden from human visitors', async ({ page }) => {
+        await page.goto('/#apply');
+        const honeypot = page.locator('input[name="hp_trap"]');
+        await expect(honeypot.first()).toBeAttached();
+        await expect(honeypot.first()).toBeHidden();
+    });
+
+    // -------------------------------------------------------------
+    // 11. SOCIAL MEDIA & OFFICIAL EMAIL LINKS
+    // -------------------------------------------------------------
+    test('13. Official email is naum@ff.unibl.org and all 5 social links are present', async ({ page }) => {
+        await page.goto('/#contact');
+
+        const emailLink = page.locator('a[href="mailto:naum@ff.unibl.org"]');
+        await expect(emailLink.first()).toBeVisible();
+
+        const socials = [
+            'https://instagram.com/naum_centar',
+            'https://www.facebook.com/profile.php?id=61576248009149',
+            'https://www.linkedin.com/company/107620789/',
+            'https://www.youtube.com/@NaumCentarzanadarenost',
+            'https://invite.viber.com/'
+        ];
+
+        for (const url of socials) {
+            const socialBtn = page.locator(`a[href*="${url}"]`).first();
+            await expect(socialBtn).toBeVisible();
+            await expect(socialBtn).toHaveAttribute('target', '_blank');
+        }
+    });
+
+    // -------------------------------------------------------------
+    // 12. FOOTER QUICK LINKS & FAQ
+    // -------------------------------------------------------------
+    test('14. Footer contains FAQ link that smoothly navigates to FAQ accordion', async ({ page }) => {
+        await page.goto('/#home');
+
+        const faqFooterBtn = page.locator('footer button:has-text("Често постављана питања")');
+        await expect(faqFooterBtn).toBeVisible();
+        await faqFooterBtn.click();
+
+        await expect(page).toHaveURL(/#apply/);
+        await expect(page.locator('#faq-section')).toBeVisible();
+    });
+
+});
