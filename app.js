@@ -90,6 +90,30 @@ const formatMentorsFromCSV = (rows) => {
         });
 };
 
+const formatNewsFromCSV = (rows) => {
+    return rows
+        .filter(r => (r.title_sr || r.title_lat || r.title_en))
+        .map((r, index) => ({
+            id: r.id ? parseInt(r.id, 10) : index + 1,
+            linkUrl: r.link_url ? r.link_url.trim() : null,
+            sr: {
+                date: r.date_sr || r.date_lat || '',
+                title: r.title_sr || r.title_lat || '',
+                summary: r.summary_sr || r.summary_lat || ''
+            },
+            lat: {
+                date: r.date_lat || r.date_sr || '',
+                title: r.title_lat || r.title_sr || '',
+                summary: r.summary_lat || r.summary_sr || ''
+            },
+            en: {
+                date: r.date_en || r.date_sr || '',
+                title: r.title_en || r.title_lat || '',
+                summary: r.summary_en || r.summary_lat || ''
+            }
+        }));
+};
+
 // --- SUBMISSION SERVICE ---
 const submitToGoogleSheet = async (payload) => {
     if (!CONFIG.GOOGLE_SCRIPT_WEBAPP_URL || !CONFIG.GOOGLE_SCRIPT_WEBAPP_URL.trim()) {
@@ -216,6 +240,26 @@ function App() {
             window.removeEventListener('popstate', handleBrowserNavigation);
             window.removeEventListener('hashchange', handleBrowserNavigation);
         };
+    }, []);
+
+    const [news, setNews] = useState(NEWS_DATA);
+
+    // Fetch live news from Google Sheet
+    useEffect(() => {
+        if (!CONFIG.GOOGLE_SHEET_NEWS_CSV_URL || !CONFIG.GOOGLE_SHEET_NEWS_CSV_URL.trim()) return;
+
+        fetch(CONFIG.GOOGLE_SHEET_NEWS_CSV_URL)
+            .then(res => res.ok ? res.text() : Promise.reject())
+            .then(csvText => {
+                if (window.Papa) {
+                    const parsed = window.Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                    if (parsed.data && parsed.data.length > 0) {
+                        const formatted = formatNewsFromCSV(parsed.data);
+                        if (formatted.length > 0) setNews(formatted);
+                    }
+                }
+            })
+            .catch(err => console.warn("Using default news:", err));
     }, []);
 
     useEffect(() => {
@@ -1136,13 +1180,13 @@ function App() {
                 </div>
                 
                 <div className="grid gap-6">
-                    {NEWS_DATA.map(news => {
-                        const n = news[lang];
+                    {news.map(item => {
+                        const n = item[lang] || item['sr'];
                         return (
-                            <Card key={news.id} className="flex flex-col sm:flex-row gap-6 hover:border-teal-200 transition-colors">
+                            <Card key={item.id} className="flex flex-col sm:flex-row gap-6 hover:border-teal-200 transition-colors">
                                 <div className="bg-gradient-to-br from-teal-50 to-blue-50 w-full sm:w-48 h-40 rounded-xl flex-shrink-0 flex flex-col items-center justify-center text-teal-700 border border-teal-100">
                                     <Icon name="calendar" className="w-8 h-8 mb-1" />
-                                    <span className="text-xs font-bold">{n.date}</span>
+                                    <span className="text-xs font-bold text-center px-2">{n.date}</span>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
                                     <span className="text-xs font-bold uppercase tracking-wider text-pink-600 mb-1">{t?.newsView?.infoTag || "Информација"}</span>
@@ -1150,9 +1194,20 @@ function App() {
                                         {n.title}
                                     </h2>
                                     <p className="text-slate-600 text-sm leading-relaxed mb-4">{n.summary}</p>
-                                    <button className="text-teal-700 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all self-start">
-                                        {t?.newsView?.readMore || "Детаљније"} <Icon name="arrow-right" className="w-4 h-4" />
-                                    </button>
+                                    {item.linkUrl ? (
+                                        <a 
+                                            href={item.linkUrl} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="text-teal-700 hover:text-teal-900 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all self-start"
+                                        >
+                                            {t?.newsView?.readMore || "Детаљније"} <Icon name="arrow-right" className="w-4 h-4" />
+                                        </a>
+                                    ) : (
+                                        <span className="text-teal-700 font-bold text-sm flex items-center gap-1 self-start opacity-50 cursor-default">
+                                            {t?.newsView?.readMore || "Детаљније"} <Icon name="arrow-right" className="w-4 h-4" />
+                                        </span>
+                                    )}
                                 </div>
                             </Card>
                         );

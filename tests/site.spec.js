@@ -7,11 +7,24 @@ const MOCK_PROGRAMS_CSV = `id,sectionType,ageGroup,areaType,title_sr,age_sr,area
 3,workshop,secondary,arts,Креативно писање и новинарство,Средња школа,Умјетност,Отворене пријаве,Опис,Kreativno pisanje,Srednja škola,Umjetnost,Otvorene prijave,Opis,Creative Writing,High School,Arts,Open,Description
 4,activity,primary,stem,Љетња научна школа,Основна школа,STEM,У припреми,Опис,Ljetnja naučna škola,Osnovna škola,STEM,U pripremi,Opis,Summer School,Primary School,STEM,In preparation,Description`;
 
+const MOCK_NEWS_CSV = `id,date_sr,date_lat,date_en,title_sr,title_lat,title_en,summary_sr,summary_lat,summary_en,link_url
+1,15. Мај 2024,15. Maj 2024,May 15 2024,Одржана прва научна радионица,Održana prva naučna radionica,First Science Workshop Held,У просторијама факултета успјешно је реализована радионица из прошлог периода.,U prostorijama fakulteta uspješno je realizovana radionica iz prošlog perioda.,Past workshop was successfully held at the faculty.,https://instagram.com/naum_centar`;
+
+
 test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
 
-    // Mock external Google Sheets CSV requests for speed (<300ms) and 100% offline reliability
     test.beforeEach(async ({ page }) => {
         await page.route('**/*output=csv*', route => {
+            const url = route.request().url();
+            // Ako je zahtjev za vijesti
+            if (url.includes('news') || url.includes('vijesti') || url.includes('gid=999')) {
+                return route.fulfill({
+                    status: 200,
+                    contentType: 'text/csv',
+                    body: MOCK_NEWS_CSV
+                });
+            }
+            // Podrazumijevano: programi
             route.fulfill({
                 status: 200,
                 contentType: 'text/csv',
@@ -368,6 +381,45 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
         // 4. Vraćanje na Ćirilicu
         await page.click('button[title="Ћирилица"]');
         await expect(footer).toContainText('Булевар војводе Петра Бојовића 1А');
+    });
+    // -------------------------------------------------------------
+    // 15. DYNAMIC NEWS WITH CUSTOM PAST DATES & LINKS
+    // -------------------------------------------------------------
+    test('17. News section loads dynamic items with custom past dates and external links', async ({ page }) => {
+        // Presrećemo config.js i ubacujemo mock URL za tabelu vijesti
+        await page.route('**/config.js*', async route => {
+            const response = await route.fetch();
+            const text = await response.text();
+            const modified = text.replace(
+                /GOOGLE_SHEET_NEWS_CSV_URL:\s*["'][^"']*["']/,
+                'GOOGLE_SHEET_NEWS_CSV_URL: "https://docs.google.com/spreadsheets/d/e/mock/pub?gid=999&single=true&output=csv"'
+            );
+            await route.fulfill({ response, body: modified });
+        });
+
+        await page.goto('/#news');
+
+        // 1. Provjera da se prikazuje prilagođeni datum iz prošlosti (15. Maj 2024)
+        const newsCard = page.locator('div.rounded-2xl', { hasText: 'Одржана прва научна радионица' });
+        await expect(newsCard.locator('text=15. Мај 2024')).toBeVisible();
+
+        // 2. Provjera da dugme "Detaljnije" ima ispravan eksterni link i otvara u novom tabu
+        const detailsLink = newsCard.locator('a[href="https://instagram.com/naum_centar"]');
+        await expect(detailsLink).toBeVisible();
+        await expect(detailsLink).toHaveAttribute('target', '_blank');
+
+        // 3. Provjera prevođenja datuma i naslova na latinicu (LAT)
+        await page.click('button[title="Latinica"]');
+        await expect(page.locator('text=15. Maj 2024')).toBeVisible();
+        await expect(page.locator('text=Održana prva naučna radionica')).toBeVisible();
+
+        // 4. Provjera na engleskom (ENG)
+        await page.click('button[title="English"]');
+        await expect(page.locator('text=May 15 2024')).toBeVisible();
+        await expect(page.locator('text=First Science Workshop Held')).toBeVisible();
+
+        // Vraćanje na ćirilicu
+        await page.click('button[title="Ћирилица"]');
     });
 
 });

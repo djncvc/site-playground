@@ -2,6 +2,7 @@
 window.CONFIG = {
     GOOGLE_SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuTdNc35_TVGa9i8fx7xoWAKdaTjoJqRP6xA5SC2_DY2IJEyPwKnY94ExK0NWRJWKTE_0eYXELOzjP/pub?gid=0&single=true&output=csv",
     GOOGLE_SHEET_MENTORS_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuTdNc35_TVGa9i8fx7xoWAKdaTjoJqRP6xA5SC2_DY2IJEyPwKnY94ExK0NWRJWKTE_0eYXELOzjP/pub?gid=1950315993&single=true&output=csv", 
+    GOOGLE_SHEET_NEWS_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuTdNc35_TVGa9i8fx7xoWAKdaTjoJqRP6xA5SC2_DY2IJEyPwKnY94ExK0NWRJWKTE_0eYXELOzjP/pub?gid=2121637061&single=true&output=csv", 
     GOOGLE_SCRIPT_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbwz2MfTB_oEiwbrfdWWzdZP4td0BuUG2ZbILnvMexVR7a6DQUyEm8QUFGCJPicF248F/exec"
     
 };
