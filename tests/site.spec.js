@@ -10,13 +10,27 @@ const MOCK_PROGRAMS_CSV = `id,sectionType,ageGroup,areaType,title_sr,age_sr,area
 const MOCK_NEWS_CSV = `id,date_sr,date_lat,date_en,title_sr,title_lat,title_en,summary_sr,summary_lat,summary_en,link_url
 1,15. Мај 2024,15. Maj 2024,May 15 2024,Одржана прва научна радионица,Održana prva naučna radionica,First Science Workshop Held,У просторијама факултета успјешно је реализована радионица из прошлог периода.,U prostorijama fakulteta uspješno je realizovana radionica iz prošlog perioda.,Past workshop was successfully held at the faculty.,https://instagram.com/naum_centar`;
 
+// Mock podaci za FAQ tabelu
+const MOCK_FAQ_CSV = `id,question_sr,question_lat,question_en,answer_sr,answer_lat,answer_en
+1,Како се врши селекција полазника?,Kako se vrši selekcija polaznika?,How is participant selection conducted?,Селекција се врши путем стандардизованих тестова.,Selekcija se vrši putem standardizovanih testova.,Selection is conducted through standardized tests.
+2,Да ли су радионице бесплатне?,Da li su radionice besplatne?,Are workshops free?,Већина програма је потпуно бесплатна захваљујући пријатељима Центра.,Većina programa je potpuno besplatna zahvaljujući prijateljima Centra.,Most programs are completely free thanks to Friends of NAUM.`;
 
 test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
 
     test.beforeEach(async ({ page }) => {
         await page.route('**/*output=csv*', route => {
             const url = route.request().url();
-            // Ako je zahtjev za vijesti
+            
+            // 1. Ako je zahtjev za FAQ
+            if (url.includes('faq') || url.includes('gid=888')) {
+                return route.fulfill({
+                    status: 200,
+                    contentType: 'text/csv',
+                    body: MOCK_FAQ_CSV
+                });
+            }
+            
+            // 2. Ako je zahtjev za vijesti
             if (url.includes('news') || url.includes('vijesti') || url.includes('gid=999')) {
                 return route.fulfill({
                     status: 200,
@@ -24,7 +38,8 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
                     body: MOCK_NEWS_CSV
                 });
             }
-            // Podrazumijevano: programi
+
+            // 3. Podrazumijevano: programi
             route.fulfill({
                 status: 200,
                 contentType: 'text/csv',
@@ -417,6 +432,51 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
         await page.click('button[title="English"]');
         await expect(page.locator('text=May 15 2024')).toBeVisible();
         await expect(page.locator('text=First Science Workshop Held')).toBeVisible();
+
+        // Vraćanje na ćirilicu
+        await page.click('button[title="Ћирилица"]');
+    });
+    // -------------------------------------------------------------
+    // 16. DYNAMIC FAQ ACCORDION & TRANSLATIONS
+    // -------------------------------------------------------------
+    test('18. FAQ section loads dynamic questions from sheet, opens answers, and translates', async ({ page }) => {
+        // Presrećemo config.js i ubacujemo mock URL za FAQ tabelu (gid=888)
+        await page.route('**/config.js*', async route => {
+            const response = await route.fetch();
+            const text = await response.text();
+            const modified = text.replace(
+                /GOOGLE_SHEET_FAQ_CSV_URL:\s*["'][^"']*["']/,
+                'GOOGLE_SHEET_FAQ_CSV_URL: "https://docs.google.com/spreadsheets/d/e/mock/pub?gid=888&single=true&output=csv"'
+            );
+            await route.fulfill({ response, body: modified });
+        });
+
+        await page.goto('/#apply');
+        const faqSection = page.locator('#faq-section');
+        await expect(faqSection).toBeVisible();
+
+        // 1. Provjera da su se učitala pitanja iz mock tabele
+        const firstQuestion = faqSection.locator('summary', { hasText: 'Како се врши селекција полазника?' });
+        await expect(firstQuestion).toBeVisible();
+
+        // 2. Klik na pitanje otvara harmoniku i prikazuje odgovor
+        await firstQuestion.click();
+        const answerText = faqSection.locator('text=Селекција се врши путем стандардизованих тестова.');
+        await expect(answerText).toBeVisible();
+
+        // 3. Prevođenje na Latinicu (LAT) i otvaranje pitanja
+        await page.click('button[title="Latinica"]');
+        const latQuestion = faqSection.locator('summary', { hasText: 'Kako se vrši selekcija polaznika?' });
+        await expect(latQuestion).toBeVisible();
+        await latQuestion.click(); // Otvara harmoniku na latinici
+        await expect(faqSection.locator('text=Selekcija se vrši putem standardizovanih testova.')).toBeVisible();
+
+        // 4. Prevođenje na Engleski (ENG) i otvaranje pitanja
+        await page.click('button[title="English"]');
+        const engQuestion = faqSection.locator('summary', { hasText: 'How is participant selection conducted?' });
+        await expect(engQuestion).toBeVisible();
+        await engQuestion.click(); // Otvara harmoniku na engleskom
+        await expect(faqSection.locator('text=Selection is conducted through standardized tests.')).toBeVisible();
 
         // Vraćanje na ćirilicu
         await page.click('button[title="Ћирилица"]');

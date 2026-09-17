@@ -3,9 +3,45 @@ window.CONFIG = {
     GOOGLE_SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuTdNc35_TVGa9i8fx7xoWAKdaTjoJqRP6xA5SC2_DY2IJEyPwKnY94ExK0NWRJWKTE_0eYXELOzjP/pub?gid=0&single=true&output=csv",
     GOOGLE_SHEET_MENTORS_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuTdNc35_TVGa9i8fx7xoWAKdaTjoJqRP6xA5SC2_DY2IJEyPwKnY94ExK0NWRJWKTE_0eYXELOzjP/pub?gid=1950315993&single=true&output=csv", 
     GOOGLE_SHEET_NEWS_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuTdNc35_TVGa9i8fx7xoWAKdaTjoJqRP6xA5SC2_DY2IJEyPwKnY94ExK0NWRJWKTE_0eYXELOzjP/pub?gid=2121637061&single=true&output=csv", 
-    GOOGLE_SCRIPT_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbwz2MfTB_oEiwbrfdWWzdZP4td0BuUG2ZbILnvMexVR7a6DQUyEm8QUFGCJPicF248F/exec"
+    GOOGLE_SCRIPT_WEBAPP_URL: "https://script.google.com/macros/s/AKfycbwz2MfTB_oEiwbrfdWWzdZP4td0BuUG2ZbILnvMexVR7a6DQUyEm8QUFGCJPicF248F/exec",
+    GOOGLE_SHEET_FAQ_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRuTdNc35_TVGa9i8fx7xoWAKdaTjoJqRP6xA5SC2_DY2IJEyPwKnY94ExK0NWRJWKTE_0eYXELOzjP/pub?gid=106884339&single=true&output=csv"
     
 };
+
+// Podrazumijevana pitanja (rezerva ako nema interneta ili linka)
+window.DEFAULT_FAQ = [
+    {
+        id: 1,
+        sr: {
+            question: "Колико трају и колико коштају програми и радионице?",
+            answer: "Трајање варира од једнодневних радионица до вишемјесечних програма. Захваљујући подршци пријатеља Центра, већина програма је бесплатна."
+        },
+        lat: {
+            question: "Koliko traju i koliko koštaju programi i radionice?",
+            answer: "Trajanje varira od jednodnevnih radionica do višemjesečnih programa. Zahvaljujući podršci prijatelja Centra, većina programa je besplatna."
+        },
+        en: {
+            question: "What is the duration and cost of programs?",
+            answer: "Durations range from single-day workshops to multi-month programs. Thanks to the support of Friends of NAUM, most programs are free of charge."
+        }
+    },
+    {
+        id: 2,
+        sr: {
+            question: "Како се врши селекција полазника?",
+            answer: "Селекција се врши путем процјене интересовања, стандардизованих тестова способности и кратког разговора са тимом психолога Центра."
+        },
+        lat: {
+            question: "Kako se vrši selekcija polaznika?",
+            answer: "Selekcija se vrši putem procjene interesovanja, standardizovanih testova sposobnosti i kratkog razgovora sa timom psihologa Centra."
+        },
+        en: {
+            question: "How is participant selection conducted?",
+            answer: "Selection is conducted through interest assessments, standardized aptitude tests, and brief interviews with the Center's psychology team."
+        }
+    }
+];
+
 // 1. PROGRAMS, WORKSHOPS & ACTIVITIES (Separated by sectionType)
 window.DEFAULT_PROGRAMS = [
     // --- Образовни програми ---

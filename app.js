@@ -8,8 +8,8 @@ const DEFAULT_MENTORS = window.MENTORS_DATA || [];
 const PARTNERS_DATA = window.PARTNERS_DATA || [];
 const NEWS_DATA = window.NEWS_DATA || [];
 const SOCIAL_LINKS = window.SOCIAL_LINKS || [];
+const DEFAULT_FAQ = window.DEFAULT_FAQ || [];
 
-// --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (PROGRAMS) ---
 // --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (PROGRAMS) ---
 const formatProgramsFromCSV = (rows) => {
     // Pametno prepoznavanje cjeline (i na srpskom i na engleskom)
@@ -110,6 +110,27 @@ const formatNewsFromCSV = (rows) => {
                 date: r.date_en || r.date_sr || '',
                 title: r.title_en || r.title_lat || '',
                 summary: r.summary_en || r.summary_lat || ''
+            }
+        }));
+};
+
+// --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (FAQ) ---
+const formatFaqFromCSV = (rows) => {
+    return rows
+        .filter(r => (r.question_sr || r.question_lat || r.question_en))
+        .map((r, index) => ({
+            id: r.id ? parseInt(r.id, 10) : index + 1,
+            sr: {
+                question: r.question_sr || r.question_lat || '',
+                answer: r.answer_sr || r.answer_lat || ''
+            },
+            lat: {
+                question: r.question_lat || r.question_sr || '',
+                answer: r.answer_lat || r.answer_sr || ''
+            },
+            en: {
+                question: r.question_en || r.question_sr || '',
+                answer: r.answer_en || r.answer_sr || ''
             }
         }));
 };
@@ -240,6 +261,26 @@ function App() {
             window.removeEventListener('popstate', handleBrowserNavigation);
             window.removeEventListener('hashchange', handleBrowserNavigation);
         };
+    }, []);
+
+    const [faqList, setFaqList] = useState(DEFAULT_FAQ);
+
+    // Fetch live FAQ from Google Sheet
+    useEffect(() => {
+        if (!CONFIG.GOOGLE_SHEET_FAQ_CSV_URL || !CONFIG.GOOGLE_SHEET_FAQ_CSV_URL.trim()) return;
+
+        fetch(CONFIG.GOOGLE_SHEET_FAQ_CSV_URL)
+            .then(res => res.ok ? res.text() : Promise.reject())
+            .then(csvText => {
+                if (window.Papa) {
+                    const parsed = window.Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                    if (parsed.data && parsed.data.length > 0) {
+                        const formatted = formatFaqFromCSV(parsed.data);
+                        if (formatted.length > 0) setFaqList(formatted);
+                    }
+                }
+            })
+            .catch(err => console.warn("Using default FAQ:", err));
     }, []);
 
     const [news, setNews] = useState(NEWS_DATA);
@@ -1150,18 +1191,26 @@ function App() {
                         </form>
                     </div>
 
-                    {/* FAQ sekcija sa ID-jem za navigaciju (Test 14) */}
+                    {/* FAQ sekcija sa ID-jem za navigaciju */}
                     <div id="faq-section" className="mt-12 scroll-mt-24">
-                        <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">{t?.applyView?.faqTitle || "Често постављана питања"}</h3>
+                        <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">
+                            {t?.applyView?.faqTitle || "Често постављана питања"}
+                        </h3>
                         <div className="space-y-3">
-                            <details className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer">
-                                <summary className="font-bold text-slate-800 text-sm">{t?.applyView?.faq1Q}</summary>
-                                <p className="mt-2 text-slate-600 text-sm leading-relaxed">{t?.applyView?.faq1A}</p>
-                            </details>
-                            <details className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer">
-                                <summary className="font-bold text-slate-800 text-sm">{t?.applyView?.faq2Q}</summary>
-                                <p className="mt-2 text-slate-600 text-sm leading-relaxed">{t?.applyView?.faq2A}</p>
-                            </details>
+                            {faqList.map(item => {
+                                const f = item[lang] || item['sr'];
+                                return (
+                                    <details key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer group">
+                                        <summary className="font-bold text-slate-800 text-sm flex justify-between items-center list-none">
+                                            <span>{f.question}</span>
+                                            <Icon name="chevron-down" className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0 ml-2" />
+                                        </summary>
+                                        <p className="mt-2 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-2">
+                                            {f.answer}
+                                        </p>
+                                    </details>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
