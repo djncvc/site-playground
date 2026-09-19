@@ -18,6 +18,15 @@ const MOCK_FAQ_CSV = `id,question_sr,question_lat,question_en,answer_sr,answer_l
 test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
 
     test.beforeEach(async ({ page }) => {
+        // Blokira odlazak testnih podataka u pravu Google Analitiku
+        await page.route('**/*googletagmanager.com*', route => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/javascript',
+                body: 'window.gtag = function() {};'
+            });
+        });
+
         await page.route('**/*output=csv*', route => {
             const url = route.request().url();
             

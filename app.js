@@ -10,6 +10,23 @@ const NEWS_DATA = window.NEWS_DATA || [];
 const SOCIAL_LINKS = window.SOCIAL_LINKS || [];
 const DEFAULT_FAQ = window.DEFAULT_FAQ || [];
 
+// --- ANALYTICS HELPER ---
+const trackEvent = (eventName, params = {}) => {
+    if (typeof window.gtag === 'function') {
+        window.gtag('event', eventName, params);
+    }
+};
+
+const trackPageView = (pageId) => {
+    if (typeof window.gtag === 'function') {
+        window.gtag('event', 'page_view', {
+            page_title: pageId,
+            page_location: window.location.href,
+            page_path: '/#' + pageId
+        });
+    }
+};
+
 // --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (PROGRAMS) ---
 const formatProgramsFromCSV = (rows) => {
     // Pametno prepoznavanje cjeline (i na srpskom i na engleskom)
@@ -465,6 +482,7 @@ function App() {
             window.location.hash = pageId;
         }
         setCurrentPage(pageId);
+        trackPageView(pageId);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -538,6 +556,10 @@ function App() {
                     lang: lang,
                     ...form
                 });
+                trackEvent('sponsor_inquiry_submitted', {
+                    support_type: form.supportType
+                });
+                
                 setSuccess(true);
                 setForm({ orgName: '', supportType: '', email: '', message: '', hp_trap: '' });
             } catch (err) {
@@ -869,6 +891,9 @@ function App() {
                     lang: lang,
                     ...form
                 });
+                trackEvent('mentor_application_submitted', {
+                    expertise_field: form.field
+                });
                 setStatusMessage(t?.mentorsView?.successMsg || "Хвала на пријави!");
                 setForm({ name: '', field: '', email: '', bio: '', hp_trap: '' });
             } catch (err) {
@@ -1015,6 +1040,10 @@ function App() {
                     formType: 'enrollment',
                     lang: lang,
                     ...form
+                });
+                trackEvent('generate_lead', {
+                    category: 'enrollment',
+                    program_title: form.programTitle
                 });
                 setStatusMessage(t?.applyView?.successMsg || "Пријава је евидентирана!");
                 setForm({
