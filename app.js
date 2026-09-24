@@ -288,16 +288,26 @@ function App() {
     const [programs, setPrograms] = useState(() => {
         try {
             const cached = localStorage.getItem('naum_cached_programs');
-            return cached ? JSON.parse(cached) : [];
-        } catch { return []; }
+            if (cached) return JSON.parse(cached);
+        } catch {}
+        if (!CONFIG.GOOGLE_SHEET_CSV_URL || !CONFIG.GOOGLE_SHEET_CSV_URL.trim()) {
+            return DEFAULT_PROGRAMS;
+        }
+        return [];
     });
     const [isProgramsLoading, setIsProgramsLoading] = useState(programs.length === 0);
 
+    // Čitanje mentora: ako postoji keš koristi ga; ako nema linka ka tabeli koristi DEFAULT_MENTORS; inače prazno dok se ne učita
     const [mentors, setMentors] = useState(() => {
         try {
             const cached = localStorage.getItem('naum_cached_mentors');
-            return cached ? JSON.parse(cached) : [];
-        } catch { return []; }
+            if (cached) return JSON.parse(cached);
+        } catch {}
+        // Ako link za tabelu mentora još nije unesen, prikaži podrazumijevane mentore
+        if (!CONFIG.GOOGLE_SHEET_MENTORS_CSV_URL || !CONFIG.GOOGLE_SHEET_MENTORS_CSV_URL.trim()) {
+            return DEFAULT_MENTORS;
+        }
+        return [];
     });
     const [isMentorsLoading, setIsMentorsLoading] = useState(mentors.length === 0);
 
