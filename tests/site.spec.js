@@ -241,21 +241,23 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
 
         // 2. Provjera da ima tačno 6 kartica
         const partnerBoxes = partnersSection.locator('span.font-extrabold');
-        await expect(partnerBoxes).toHaveCount(6);
+        await expect(partnerBoxes).toHaveCount(7);
 
         // 3. Provjera tačnog redoslijeda i naziva partnera
         // 1. Fondacija "Kaća" (mora biti prva)
         await expect(partnerBoxes.nth(0)).toContainText('Фондација "Каћа"');
-        // 2. Grad Banja Luka
-        await expect(partnerBoxes.nth(1)).toContainText('Град Бања Лука');
-        // 3. Grad Bijeljina
-        await expect(partnerBoxes.nth(2)).toContainText('Град Бијељина');
-        // 4. Društvo psihologa RS
-        await expect(partnerBoxes.nth(3)).toContainText('Друштво психолога Републике Српске');
-        // 5. Mensa BiH
-        await expect(partnerBoxes.nth(4)).toContainText('Менса БиХ');
-        // 6. Muzička škola Opus conmusica
-        await expect(partnerBoxes.nth(5)).toContainText('Музичка школа "Opus conmusica"');
+        // 2. LANACO  
+        await expect(partnerBoxes.nth(1)).toContainText('Компанија LANACO');
+        // 3. Grad Banja Luka
+        await expect(partnerBoxes.nth(2)).toContainText('Град Бања Лука');
+        // 4. Grad Bijeljina
+        await expect(partnerBoxes.nth(3)).toContainText('Град Бијељина');
+        // 5. Društvo psihologa RS
+        await expect(partnerBoxes.nth(4)).toContainText('Друштво психолога Републике Српске');
+        // 6. Mensa BiH
+        await expect(partnerBoxes.nth(5)).toContainText('Менса БиХ');
+        // 7. Muzička škola Opus conmusica
+        await expect(partnerBoxes.nth(6)).toContainText('Музичка школа "Opus conmusica"');
 
         // 4. Provjera da nema starih uloga/objašnjenja
         await expect(partnersSection).not.toContainText('Главни покровитељ');

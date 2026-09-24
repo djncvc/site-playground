@@ -79,26 +79,32 @@ const formatMentorsFromCSV = (rows) => {
     ];
 
     return rows
-        .filter(r => r.name && r.name.trim() !== "")
+        .filter(r => (r.name_sr || r.name_lat || r.name || '').trim() !== '')
         .map((r, index) => {
-            const initials = r.name.split(" ").filter(w => !w.includes(".")).map(w => w[0]).slice(0, 2).join("") || "М";
+            const nameSr = r.name_sr || r.name || '';
+            const nameLat = r.name_lat || r.name || nameSr;
+            const nameEn = r.name_en || r.name_lat || nameSr;
+            const initials = nameSr.split(" ").filter(w => !w.includes(".")).map(w => w[0]).slice(0, 2).join("") || "М";
+
             return {
                 id: r.id ? parseInt(r.id, 10) : index + 1,
-                name: r.name,
                 photoUrl: r.photo_url ? r.photo_url.trim() : null,
                 avatarBg: gradients[index % gradients.length],
                 initials: initials,
                 sr: {
+                    name: nameSr,
                     role: r.role_sr || r.role_lat || '',
                     field: r.field_sr || r.field_lat || '',
                     bio: r.bio_sr || r.bio_lat || ''
                 },
                 lat: {
+                    name: nameLat,
                     role: r.role_lat || r.role_sr || '',
                     field: r.field_lat || r.field_sr || '',
                     bio: r.bio_lat || r.bio_sr || ''
                 },
                 en: {
+                    name: nameEn,
                     role: r.role_en || r.role_sr || '',
                     field: r.field_en || r.field_sr || '',
                     bio: r.bio_en || r.bio_sr || ''
@@ -107,11 +113,13 @@ const formatMentorsFromCSV = (rows) => {
         });
 };
 
+// --- HELPER: FORMAT GOOGLE SHEET CSV ROWS (NEWS) ---
 const formatNewsFromCSV = (rows) => {
     return rows
         .filter(r => (r.title_sr || r.title_lat || r.title_en))
         .map((r, index) => ({
             id: r.id ? parseInt(r.id, 10) : index + 1,
+            imageUrl: r.image_url ? r.image_url.trim() : null,
             linkUrl: r.link_url ? r.link_url.trim() : null,
             sr: {
                 date: r.date_sr || r.date_lat || '',
@@ -905,7 +913,7 @@ function App() {
 
         return (
             <Section>
-                {/* 1. Наши ментори (Mentors Showcase) */}
+                {/* 1. Наши ментори (Mentors Showcase sa ujednačenom visinom) */}
                 <div id="our-mentors-section" className="scroll-mt-24 mb-20">
                     <div className="max-w-3xl mx-auto text-center mb-12">
                         <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
@@ -920,28 +928,41 @@ function App() {
                     <div className="grid md:grid-cols-3 gap-8">
                         {mentors.map(mentor => {
                             const mLang = mentor[lang] || mentor['sr'] || {};
+                            const mentorName = mLang.name || mentor.name;
                             return (
-                                <Card key={mentor.id} className="flex flex-col text-center items-center hover:border-teal-300 transition-all p-8">
-                                    {mentor.photoUrl ? (
-                                        <img 
-                                            src={mentor.photoUrl} 
-                                            alt={mentor.name} 
-                                            className="w-24 h-24 rounded-full object-cover shadow-md mb-4 border-2 border-teal-500" 
-                                        />
-                                    ) : (
-                                        <div className={`w-24 h-24 rounded-full bg-gradient-to-tr ${mentor.avatarBg || "from-teal-500 to-emerald-600"} text-white flex items-center justify-center text-2xl font-extrabold shadow-lg mb-4`}>
-                                            {mentor.initials || "М"}
-                                        </div>
-                                    )}
+                                <Card key={mentor.id} className="flex flex-col text-center items-center hover:border-teal-300 transition-all p-6 sm:p-8 h-full">
+                                    {/* Fotografija ili Avatar */}
+                                    <div className="flex-shrink-0 mb-4">
+                                        {mentor.photoUrl ? (
+                                            <img 
+                                                src={mentor.photoUrl} 
+                                                alt={mentorName} 
+                                                className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-teal-500" 
+                                            />
+                                        ) : (
+                                            <div className={`w-24 h-24 rounded-full bg-gradient-to-tr ${mentor.avatarBg || "from-teal-500 to-emerald-600"} text-white flex items-center justify-center text-2xl font-extrabold shadow-lg`}>
+                                                {mentor.initials || "М"}
+                                            </div>
+                                        )}
+                                    </div>
 
-                                    <h3 className="text-xl font-bold text-slate-900 mb-1">{mentor.name}</h3>
-                                    <span className="text-xs font-bold text-teal-700 uppercase tracking-wider mb-2">
-                                        {mLang.field || mentor.field}
-                                    </span>
-                                    <span className="text-xs text-slate-400 font-medium mb-4">{mLang.role || mentor.role}</span>
-                                    <p className="text-slate-600 text-sm leading-relaxed mt-auto border-t border-slate-100 pt-4">
-                                        {mLang.bio || mentor.bio}
-                                    </p>
+                                    {/* Zaglavlje kartice (Ime, oblast, zvanje) sa minimalnom fiksnom visinom */}
+                                    <div className="min-h-[110px] flex flex-col items-center justify-start w-full mb-3">
+                                        <h3 className="text-xl font-bold text-slate-900 mb-1 leading-snug">{mentorName}</h3>
+                                        <span className="text-xs font-bold text-teal-700 uppercase tracking-wider mb-1 line-clamp-2">
+                                            {mLang.field || mentor.field}
+                                        </span>
+                                        <span className="text-xs text-slate-400 font-medium leading-tight">
+                                            {mLang.role || mentor.role}
+                                        </span>
+                                    </div>
+
+                                    {/* Biografija sa linijom koja počinje na IDENTIČNOM nivou na svim karticama */}
+                                    <div className="w-full border-t border-slate-100 pt-4 flex-grow flex items-start justify-center">
+                                        <p className="text-slate-600 text-sm leading-relaxed text-center">
+                                            {mLang.bio || mentor.bio}
+                                        </p>
+                                    </div>
                                 </Card>
                             );
                         })}
@@ -1261,28 +1282,47 @@ function App() {
                     {news.map(item => {
                         const n = item[lang] || item['sr'];
                         return (
-                            <Card key={item.id} className="flex flex-col sm:flex-row gap-6 hover:border-teal-200 transition-colors">
-                                <div className="bg-gradient-to-br from-teal-50 to-blue-50 w-full sm:w-48 h-40 rounded-xl flex-shrink-0 flex flex-col items-center justify-center text-teal-700 border border-teal-100">
-                                    <Icon name="calendar" className="w-8 h-8 mb-1" />
-                                    <span className="text-xs font-bold text-center px-2">{n.date}</span>
+                            <Card key={item.id} className="flex flex-col sm:flex-row gap-6 hover:border-teal-200 transition-colors overflow-hidden p-0 sm:p-6">
+                                {/* Lijevo: FOTOGRAFIJA vijesti (ili ikona ako slika nije unijeta) */}
+                                <div className="w-full sm:w-52 h-48 sm:h-44 rounded-t-2xl sm:rounded-xl flex-shrink-0 overflow-hidden bg-slate-100 border border-slate-100 flex items-center justify-center">
+                                    {item.imageUrl ? (
+                                        <img 
+                                            src={item.imageUrl} 
+                                            alt={n.title} 
+                                            className="w-full h-full object-cover transition-transform hover:scale-105 duration-300" 
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center text-teal-600 p-4">
+                                            <Icon name="book-open" className="w-10 h-10 opacity-50 mb-1" />
+                                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">НАУМ Вијести</span>
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="flex-1 flex flex-col justify-center">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-pink-600 mb-1">{t?.newsView?.infoTag || "Информација"}</span>
-                                    <h2 className="text-2xl font-bold text-slate-900 mb-2 hover:text-teal-700 cursor-pointer transition-colors">
+
+                                {/* Desno: DATUM umjesto "Informacija", zatim naslov, opis i link */}
+                                <div className="flex-1 flex flex-col justify-center p-6 sm:p-0">
+                                    {/* Datum sa ikonicom kalendara na vrhu */}
+                                    <div className="flex items-center gap-1.5 text-xs font-bold text-pink-600 uppercase tracking-wider mb-2">
+                                        <Icon name="calendar" className="w-3.5 h-3.5" />
+                                        <span>{n.date}</span>
+                                    </div>
+
+                                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 hover:text-teal-700 cursor-pointer transition-colors leading-snug">
                                         {n.title}
                                     </h2>
                                     <p className="text-slate-600 text-sm leading-relaxed mb-4">{n.summary}</p>
+                                    
                                     {item.linkUrl ? (
                                         <a 
                                             href={item.linkUrl} 
                                             target="_blank" 
                                             rel="noopener noreferrer" 
-                                            className="text-teal-700 hover:text-teal-900 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all self-start"
+                                            className="text-teal-700 hover:text-teal-900 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all self-start mt-auto"
                                         >
                                             {t?.newsView?.readMore || "Детаљније"} <Icon name="arrow-right" className="w-4 h-4" />
                                         </a>
                                     ) : (
-                                        <span className="text-teal-700 font-bold text-sm flex items-center gap-1 self-start opacity-50 cursor-default">
+                                        <span className="text-teal-700 font-bold text-sm flex items-center gap-1 self-start opacity-50 cursor-default mt-auto">
                                             {t?.newsView?.readMore || "Детаљније"} <Icon name="arrow-right" className="w-4 h-4" />
                                         </span>
                                     )}

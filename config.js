@@ -240,44 +240,97 @@ window.DEFAULT_PROGRAMS = [
     }
 ];
 
-// 2. MENTORS DATA (Biographies, Fields & Avatars)
+// config.js (Ažurirani dio za partnere, mentore i vijesti)
+
+// 2. MENTORI SA LATINIČNIM IMENIMA
 window.MENTORS_DATA = [
     {
         id: 1,
-        name: "Проф. др Драгана Петровић",
-        field: "Психологија и развојна даровитост",
-        role: "Редовни професор, Филозофски факултет",
-        bio: "Преко 15 година посвећена идентификацији и подстицању даровите дјеце. Аутор бројних научних радова о когнитивном развоју.",
+        photoUrl: null,
         avatarBg: "from-teal-500 to-emerald-600",
-        initials: "ДП"
+        initials: "ДП",
+        sr: {
+            name: "Проф. др Драгана Петровић",
+            field: "Психологија и развојна даровитост",
+            role: "Редовни професор, Филозофски факултет",
+            bio: "Преко 15 година посвећена идентификацији и подстицању даровите дјеце. Аутор бројних научних радова о когнитивном развоју."
+        },
+        lat: {
+            name: "Prof. dr Dragana Petrović",
+            field: "Psihologija i razvojna darovitost",
+            role: "Redovni profesor, Filozofski fakultet",
+            bio: "Preko 15 godina posvećena identifikaciji i podsticanju darovite djece. Autor brojnih naučnih radova o kognitivnom razvoju."
+        },
+        en: {
+            name: "Prof. Dr. Dragana Petrović",
+            field: "Psychology & Gifted Development",
+            role: "Full Professor, Faculty of Philosophy",
+            bio: "Dedicated to the identification and advancement of gifted children for over 15 years."
+        }
     },
     {
         id: 2,
-        name: "Доц. др Милош Вуковић",
-        field: "Математика и теоријско рачунарство",
-        role: "Доцент, ПМФ Универзитета у Бањој Луци",
-        bio: "Вођа тима за математичке олимпијаде, истраживач у области дискретне математике и напредних алгоритама.",
+        photoUrl: null,
         avatarBg: "from-blue-600 to-indigo-600",
-        initials: "МВ"
+        initials: "МВ",
+        sr: {
+            name: "Доц. др Милош Вуковић",
+            field: "Математика и теоријско рачунарство",
+            role: "Доцент, ПМФ Универзитета у Бањој Луци",
+            bio: "Вођа тима за математичке олимпијаде, истраживач у области дискретне математике и напредних алгоритама."
+        },
+        lat: {
+            name: "Doc. dr Miloš Vuković",
+            field: "Matematika i teorijsko računarstvo",
+            role: "Docent, PMF Univerziteta u Banjoj Luci",
+            bio: "Vođa tima za matematičke olimpijade, istraživač u oblasti diskretne matematike i naprednih algoritama."
+        },
+        en: {
+            name: "Asst. Prof. Dr. Miloš Vuković",
+            field: "Mathematics & Computer Science",
+            role: "Assistant Professor, Faculty of Sciences",
+            bio: "Olympiad team mentor and researcher in discrete mathematics and advanced algorithms."
+        }
     },
     {
         id: 3,
-        name: "Мр Јелена Станић",
-        field: "Креативно писање и компаративна књижевност",
-        role: "Ментор за хуманистичке науке",
-        bio: "Писац и уредник, водила бројне радионице нарације за средњошколце и припремала младе ауторе за међународне конкурсе.",
+        photoUrl: null,
         avatarBg: "from-pink-500 to-rose-600",
-        initials: "ЈС"
+        initials: "ЈС",
+        sr: {
+            name: "Мр Јелена Станић",
+            field: "Креативно писање и књижевност",
+            role: "Ментор за хуманистичке науке",
+            bio: "Писац и уредник, водила бројне радионице нарације за средњошколце и припремала младе ауторе за међународне конкурсе."
+        },
+        lat: {
+            name: "Mr Jelena Stanić",
+            field: "Kreativno pisanje i književnost",
+            role: "Mentor za humanističke nauke",
+            bio: "Pisac i urednik, vodila brojne radionice naracije za srednjoškolce i pripremala mlade autore za međunarodne konkurse."
+        },
+        en: {
+            name: "M.Sc. Jelena Stanić",
+            field: "Creative Writing & Literature",
+            role: "Humanities Mentor",
+            bio: "Author and editor, leading creative narrative workshops for secondary school students."
+        }
     }
 ];
 
-// 3. PRIJATELJI NAUM-A (Fondacija Kaća 1., bez uloga, dodate nove institucije)
+// 3. PRIJATELJI NAUM-A (Fondacija Kaća 1., Kompanija LANACO 2.)
 window.PARTNERS_DATA = [
     { 
         name: "Фондација \"Каћа\"", 
         lat: "Fondacija \"Kaća\"",
         en: "Foundation \"Kaća\"",
         color: "border-pink-300 text-pink-900 bg-pink-50/90 shadow-sm ring-2 ring-pink-400/20" 
+    },
+    { 
+        name: "Компанија LANACO", 
+        lat: "Kompanija LANACO",
+        en: "Company LANACO",
+        color: "border-blue-300 text-blue-950 bg-blue-50/90 shadow-sm ring-2 ring-blue-500/20" 
     },
     { 
         name: "Град Бања Лука", 
@@ -311,10 +364,12 @@ window.PARTNERS_DATA = [
     }
 ];
 
-// 4. NEWS DATA
+// 4. VIJESTI (Sa podrškom za imageUrl)
 window.NEWS_DATA = [
     {
         id: 1,
+        imageUrl: null,
+        linkUrl: null,
         sr: {
             date: "25. Дец 2024",
             title: "Отворен конкурс за нове менторе",
@@ -333,6 +388,8 @@ window.NEWS_DATA = [
     },
     {
         id: 2,
+        imageUrl: null,
+        linkUrl: null,
         sr: {
             date: "20. Дец 2024",
             title: "Успјешно завршен зимски камп",
