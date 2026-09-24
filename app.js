@@ -221,6 +221,26 @@ const Card = ({ children, className = "" }) => (
     </div>
 );
 
+// Skeleton privremena kartica dok traje učitavanje
+const SkeletonCard = () => (
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col h-full animate-pulse">
+        <div className="flex justify-between items-center mb-4">
+            <div className="h-5 w-20 bg-slate-200 rounded-full"></div>
+            <div className="h-5 w-24 bg-slate-200 rounded-full"></div>
+        </div>
+        <div className="h-6 w-3/4 bg-slate-200 rounded-md mb-3"></div>
+        <div className="space-y-2 flex-grow mb-6">
+            <div className="h-4 w-full bg-slate-100 rounded"></div>
+            <div className="h-4 w-5/6 bg-slate-100 rounded"></div>
+            <div className="h-4 w-4/6 bg-slate-100 rounded"></div>
+        </div>
+        <div className="border-t border-slate-100 pt-4 flex justify-between items-center">
+            <div className="h-5 w-16 bg-slate-200 rounded"></div>
+            <div className="h-5 w-20 bg-slate-200 rounded"></div>
+        </div>
+    </div>
+);
+
 const LanguageSelector = ({ currentLang, onSelectLang }) => {
     const langs = [
         { id: 'sr', label: 'ЋИР', title: 'Ћирилица' },
@@ -265,9 +285,21 @@ function App() {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [selectedProgramForApply, setSelectedProgramForApply] = useState(null);
 
-    const [programs, setPrograms] = useState(DEFAULT_PROGRAMS);
-    const [isProgramsLoading, setIsProgramsLoading] = useState(false);
-    const [mentors, setMentors] = useState(DEFAULT_MENTORS);
+    const [programs, setPrograms] = useState(() => {
+        try {
+            const cached = localStorage.getItem('naum_cached_programs');
+            return cached ? JSON.parse(cached) : [];
+        } catch { return []; }
+    });
+    const [isProgramsLoading, setIsProgramsLoading] = useState(programs.length === 0);
+
+    const [mentors, setMentors] = useState(() => {
+        try {
+            const cached = localStorage.getItem('naum_cached_mentors');
+            return cached ? JSON.parse(cached) : [];
+        } catch { return []; }
+    });
+    const [isMentorsLoading, setIsMentorsLoading] = useState(mentors.length === 0);
 
     const t = (window.I18N && window.I18N[lang]) ? window.I18N[lang] : (window.I18N ? window.I18N['sr'] : {});
 
@@ -335,9 +367,11 @@ function App() {
 
     // 1. Fetch live programs
     useEffect(() => {
-        if (!CONFIG.GOOGLE_SHEET_CSV_URL || !CONFIG.GOOGLE_SHEET_CSV_URL.trim()) return;
+        if (!CONFIG.GOOGLE_SHEET_CSV_URL || !CONFIG.GOOGLE_SHEET_CSV_URL.trim()) {
+            setIsProgramsLoading(false);
+            return;
+        }
 
-        setIsProgramsLoading(true);
         fetch(CONFIG.GOOGLE_SHEET_CSV_URL)
             .then(res => res.ok ? res.text() : Promise.reject())
             .then(csvText => {
@@ -345,17 +379,23 @@ function App() {
                     const parsed = window.Papa.parse(csvText, { header: true, skipEmptyLines: true });
                     if (parsed.data && parsed.data.length > 0) {
                         const formatted = formatProgramsFromCSV(parsed.data);
-                        if (formatted.length > 0) setPrograms(formatted);
+                        if (formatted.length > 0) {
+                            setPrograms(formatted);
+                            localStorage.setItem('naum_cached_programs', JSON.stringify(formatted));
+                        }
                     }
                 }
             })
-            .catch(err => console.warn("Using default programs:", err))
+            .catch(err => console.warn("Greška pri učitavanju programa:", err))
             .finally(() => setIsProgramsLoading(false));
     }, []);
 
-    // 2. Fetch live mentors from Nasi_Mentori sheet tab
+    // 2. Fetch live mentors 
     useEffect(() => {
-        if (!CONFIG.GOOGLE_SHEET_MENTORS_CSV_URL || !CONFIG.GOOGLE_SHEET_MENTORS_CSV_URL.trim()) return;
+        if (!CONFIG.GOOGLE_SHEET_MENTORS_CSV_URL || !CONFIG.GOOGLE_SHEET_MENTORS_CSV_URL.trim()) {
+            setIsMentorsLoading(false);
+            return;
+        }
 
         fetch(CONFIG.GOOGLE_SHEET_MENTORS_CSV_URL)
             .then(res => res.ok ? res.text() : Promise.reject())
@@ -364,11 +404,15 @@ function App() {
                     const parsed = window.Papa.parse(csvText, { header: true, skipEmptyLines: true });
                     if (parsed.data && parsed.data.length > 0) {
                         const formatted = formatMentorsFromCSV(parsed.data);
-                        if (formatted.length > 0) setMentors(formatted);
+                        if (formatted.length > 0) {
+                            setMentors(formatted);
+                            localStorage.setItem('naum_cached_mentors', JSON.stringify(formatted));
+                        }
                     }
                 }
             })
-            .catch(err => console.warn("Using default mentors:", err));
+            .catch(err => console.warn("Greška pri učitavanju mentora:", err))
+            .finally(() => setIsMentorsLoading(false));
     }, []);
 
     const isClosedStatus = (statusStr) => {
@@ -500,55 +544,86 @@ function App() {
         return 'bg-indigo-50 text-indigo-700 border-indigo-200';
     };
 
-    const ProgramCardsGrid = ({ items }) => (
-        <div className="grid md:grid-cols-3 gap-6">
-            {items.map(program => {
-                const p = program[lang] || program['sr'];
-                const closed = isClosedStatus(p.status);
-                const inPrep = isInPrepStatus(p.status);
-                return (
-                    <Card key={program.id} className="flex flex-col h-full hover:border-teal-300 transition-all group">
-                        <div className="flex justify-between items-start mb-4">
-                            <span className="bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1 rounded-full">
-                                {p.age}
-                            </span>
-                            <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${getAreaTagStyle(program.areaType)}`}>
-                                {p.area}
-                            </span>
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-700 transition-colors">
-                            {p.title}
-                        </h3>
-                        <p className="text-slate-600 mb-6 flex-grow text-sm leading-relaxed">
-                            {p.description}
-                        </p>
-                        <div className="flex justify-between items-center mt-auto border-t border-slate-100 pt-4">
-                            <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusBadgeStyle(p.status)}`}>
-                                {p.status}
-                            </span>
+    // --- GLAVNA PROGRAM CARDS GRID KOMPONENTA ---
+    const ProgramCardsGrid = ({ items, isLoading = false }) => {
+        // Ako se podaci još učitavaju a lista je prazna, prikazujemo 3 pulsirajuće kartice
+        if (isLoading && items.length === 0) {
+            return (
+                <div className="grid md:grid-cols-3 gap-6">
+                    <SkeletonCard />
+                    <SkeletonCard />
+                    <SkeletonCard />
+                </div>
+            );
+        }
+
+        // Ako je učitavanje završeno, a u kategoriji nema stavki
+        if (!isLoading && items.length === 0) {
+            return (
+                <div className="text-center py-10 text-slate-400 font-medium">
+                    {lang === 'en' 
+                        ? 'No programs currently available in this category.' 
+                        : (lang === 'lat' ? 'Trenutno nema dostupnih sadržaja u ovoj kategoriji.' : 'Тренутно нема доступних садржаја у овој категорији.')}
+                </div>
+            );
+        }
+
+        return (
+            <div className="grid md:grid-cols-3 gap-6">
+                {items.map(program => {
+                    const p = program[lang] || program['sr'];
+                    const closed = isClosedStatus(p.status);
+                    const inPrep = isInPrepStatus(p.status);
+
+                    return (
+                        <Card key={program.id} className="flex flex-col h-full hover:border-teal-300 transition-all group">
+                            <div className="flex justify-between items-start mb-4">
+                                <span className="bg-slate-100 text-slate-700 text-xs font-bold px-3 py-1 rounded-full">
+                                    {p.age}
+                                </span>
+                                <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${getAreaTagStyle(program.areaType)}`}>
+                                    {p.area}
+                                </span>
+                            </div>
                             
-                            {closed ? (
-                                <span className="text-xs text-slate-400 font-semibold italic cursor-not-allowed">
-                                    {t?.sections?.closedBtn || "Пријаве затворене"}
+                            <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-700 transition-colors">
+                                {p.title}
+                            </h3>
+                            
+                            <p className="text-slate-600 mb-6 flex-grow text-sm leading-relaxed">
+                                {p.description}
+                            </p>
+                            
+                            <div className="flex justify-between items-center mt-auto border-t border-slate-100 pt-4">
+                                <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusBadgeStyle(p.status)}`}>
+                                    {p.status}
                                 </span>
-                            ) : inPrep ? (
-                                <span className="text-xs text-amber-700 font-semibold italic cursor-not-allowed">
-                                    {t?.sections?.inPrepBtn || "У припреми"}
-                                </span>
-                            ) : (
-                                <button 
-                                    onClick={() => handleApplyClick(program)}
-                                    className="text-teal-700 hover:text-teal-900 font-bold text-sm flex items-center gap-1 group-hover:translate-x-1 transition-all"
-                                >
-                                    {t?.sections?.applyBtn || "Пријави се"} <Icon name="arrow-right" className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
-                    </Card>
-                );
-            })}
-        </div>
-    );
+                                
+                                {closed ? (
+                                    <span className="text-xs text-slate-400 font-semibold italic cursor-not-allowed">
+                                        {t?.sections?.closedBtn || "Пријаве затворене"}
+                                    </span>
+                                ) : inPrep ? (
+                                    <span className="text-xs text-amber-700 font-semibold italic cursor-not-allowed">
+                                        {t?.sections?.inPrepBtn || "У припреми"}
+                                    </span>
+                                ) : (
+                                    <button 
+                                        type="button"
+                                        onClick={() => handleApplyClick(program)}
+                                        className="text-teal-700 hover:text-teal-900 font-bold text-sm flex items-center gap-1 group-hover:translate-x-1 transition-all"
+                                    >
+                                        <span>{t?.sections?.applyBtn || "Пријави се"}</span>
+                                        <Icon name="arrow-right" className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+                        </Card>
+                    );
+                })}
+            </div>
+        );
+    };
 
     const SupportForm = () => {
         const [form, setForm] = useState({ orgName: '', supportType: '', email: '', message: '', hp_trap: '' });
@@ -688,7 +763,7 @@ function App() {
                             {t?.sections?.allBtn || "Види све"} <Icon name="chevron-right" className="w-5 h-5" />
                         </button>
                     </div>
-                    <ProgramCardsGrid items={educationItems} />
+                    <ProgramCardsGrid items={educationItems} isLoading={isProgramsLoading} />
                 </Section>
 
                 {/* 2. Радионице */}
@@ -705,7 +780,7 @@ function App() {
                             {t?.sections?.allBtn || "Види све"} <Icon name="chevron-right" className="w-5 h-5" />
                         </button>
                     </div>
-                    <ProgramCardsGrid items={workshopItems} />
+                    <ProgramCardsGrid items={workshopItems} isLoading={isProgramsLoading} />
                 </Section>
 
                 {/* 3. Активности */}
@@ -722,7 +797,7 @@ function App() {
                             {t?.sections?.allBtn || "Види све"} <Icon name="chevron-right" className="w-5 h-5" />
                         </button>
                     </div>
-                    <ProgramCardsGrid items={activityItems} />
+                    <ProgramCardsGrid items={activityItems} isLoading={isProgramsLoading} />
                 </Section>
 
                 {/* Call for Mentors Banner */}
@@ -877,7 +952,7 @@ function App() {
                         Учитавање...
                     </div>
                 ) : (
-                    <ProgramCardsGrid items={filtered} />
+                    <ProgramCardsGrid items={filtered} isLoading={isProgramsLoading} />
                 )}
             </Section>
         );
