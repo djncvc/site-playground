@@ -884,6 +884,10 @@ function App() {
     };
 
     const MentorsView = () => {
+        // Stanje za izabranog mentora za pop-up prozor
+        const [selectedMentor, setSelectedMentor] = useState(null);
+
+        // Stanja za formular za prijavu novih mentora
         const [form, setForm] = useState({ name: '', field: '', email: '', bio: '', hp_trap: '' });
         const [isSubmitting, setIsSubmitting] = useState(false);
         const [statusMessage, setStatusMessage] = useState('');
@@ -899,9 +903,6 @@ function App() {
                     lang: lang,
                     ...form
                 });
-                trackEvent('mentor_application_submitted', {
-                    expertise_field: form.field
-                });
                 setStatusMessage(t?.mentorsView?.successMsg || "Хвала на пријави!");
                 setForm({ name: '', field: '', email: '', bio: '', hp_trap: '' });
             } catch (err) {
@@ -911,15 +912,21 @@ function App() {
             }
         };
 
+        const readBioLabel = lang === 'en' 
+            ? 'Read full biography' 
+            : (lang === 'lat' ? 'Pročitaj cijelu biografiju' : 'Прочитај цијелу биографију');
+
         return (
             <Section>
-                {/* 1. Наши ментори (Mentors Showcase sa ujednačenom visinom) */}
+                {/* 1. НАШИ МЕНТОРИ (Showcase kartice sa ujednačenom visinom) */}
                 <div id="our-mentors-section" className="scroll-mt-24 mb-20">
                     <div className="max-w-3xl mx-auto text-center mb-12">
                         <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
                             Академски тим
                         </span>
-                        <h1 className="text-4xl font-extrabold text-slate-900 mt-3 mb-4">{t?.mentorsSection?.title || "Наши ментори"}</h1>
+                        <h1 className="text-4xl font-extrabold text-slate-900 mt-3 mb-4">
+                            {t?.mentorsSection?.title || "Наши ментори"}
+                        </h1>
                         <p className="text-lg text-slate-600 leading-relaxed">
                             {t?.mentorsSection?.subtitle || "Истакнути професори и стручњаци"}
                         </p>
@@ -946,7 +953,7 @@ function App() {
                                         )}
                                     </div>
 
-                                    {/* Zaglavlje kartice (Ime, oblast, zvanje) sa minimalnom fiksnom visinom */}
+                                    {/* Zaglavlje kartice (Ime, oblast, zvanje sa fiksnom minimalnom visinom) */}
                                     <div className="min-h-[110px] flex flex-col items-center justify-start w-full mb-3">
                                         <h3 className="text-xl font-bold text-slate-900 mb-1 leading-snug">{mentorName}</h3>
                                         <span className="text-xs font-bold text-teal-700 uppercase tracking-wider mb-1 line-clamp-2">
@@ -957,11 +964,20 @@ function App() {
                                         </span>
                                     </div>
 
-                                    {/* Biografija sa linijom koja počinje na IDENTIČNOM nivou na svim karticama */}
-                                    <div className="w-full border-t border-slate-100 pt-4 flex-grow flex items-start justify-center">
-                                        <p className="text-slate-600 text-sm leading-relaxed text-center">
+                                    {/* Biografija: skraćena na 4 reda + Dugme za otvaranje cele biografije */}
+                                    <div className="w-full border-t border-slate-100 pt-4 flex-grow flex flex-col justify-between">
+                                        <p className="text-slate-600 text-sm leading-relaxed text-center line-clamp-4 mb-4">
                                             {mLang.bio || mentor.bio}
                                         </p>
+                                        
+                                        <button
+                                            type="button"
+                                            onClick={() => setSelectedMentor(mentor)}
+                                            className="text-teal-700 hover:text-teal-900 font-bold text-xs flex items-center justify-center gap-1 hover:underline mt-auto self-center p-1 transition-colors"
+                                        >
+                                            <span>{readBioLabel}</span>
+                                            <Icon name="chevron-right" className="w-3.5 h-3.5" />
+                                        </button>
                                     </div>
                                 </Card>
                             );
@@ -969,14 +985,18 @@ function App() {
                     </div>
                 </div>
 
-                {/* 2. Пријава за нове менторе */}
+                {/* 2. ПРИЈАВА ЗА НОВЕ МЕНТОРЕ */}
                 <div id="mentor-form-section" className="bg-white p-8 md:p-10 rounded-3xl max-w-2xl mx-auto border border-slate-200 shadow-sm scroll-mt-24">
                     <div className="text-center mb-6">
                         <span className="text-xs font-bold uppercase tracking-widest text-pink-600 bg-pink-50 px-3 py-1 rounded-full border border-pink-200">
                             {t?.mentorsView?.tag || "Конкурс"}
                         </span>
-                        <h3 className="text-2xl font-bold text-slate-900 mt-2">{t?.mentorsSection?.applyHeading || "Пријава за нове менторе"}</h3>
-                        <p className="text-sm text-slate-500 mt-1">{t?.mentorsSection?.applySub || "Попуните формулар испод."}</p>
+                        <h3 className="text-2xl font-bold text-slate-900 mt-2">
+                            {t?.mentorsSection?.applyHeading || "Пријава за нове менторе"}
+                        </h3>
+                        <p className="text-sm text-slate-500 mt-1">
+                            {t?.mentorsSection?.applySub || "Попуните формулар испод."}
+                        </p>
                     </div>
 
                     {statusMessage && (
@@ -1012,6 +1032,61 @@ function App() {
                         </Button>
                     </form>
                 </div>
+
+                {/* 3. MODALNI POP-UP PROZOR ZA KOMPLETNU BIOGRAFIJU */}
+                {selectedMentor && (
+                    <div 
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200"
+                        onClick={() => setSelectedMentor(null)}
+                    >
+                        <div 
+                            className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden border border-slate-100"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            {/* Zaglavlje modala sa slikom, imenom i dugmetom 'X' */}
+                            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 flex-shrink-0">
+                                <div className="flex items-center gap-4">
+                                    {selectedMentor.photoUrl ? (
+                                        <img 
+                                            src={selectedMentor.photoUrl} 
+                                            alt="" 
+                                            className="w-16 h-16 rounded-full object-cover border-2 border-teal-500 shadow-sm flex-shrink-0" 
+                                        />
+                                    ) : (
+                                        <div className={`w-16 h-16 rounded-full bg-gradient-to-tr ${selectedMentor.avatarBg || "from-teal-500 to-emerald-600"} text-white flex items-center justify-center text-xl font-extrabold shadow flex-shrink-0`}>
+                                            {selectedMentor.initials}
+                                        </div>
+                                    )}
+                                    <div className="text-left">
+                                        <h3 className="text-xl font-bold text-slate-900 leading-snug">
+                                            {(selectedMentor[lang] || selectedMentor['sr'])?.name || selectedMentor.name}
+                                        </h3>
+                                        <span className="text-xs font-bold text-teal-700 uppercase tracking-wider block">
+                                            {(selectedMentor[lang] || selectedMentor['sr'])?.field}
+                                        </span>
+                                        <span className="text-xs text-slate-500">
+                                            {(selectedMentor[lang] || selectedMentor['sr'])?.role}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    type="button"
+                                    onClick={() => setSelectedMentor(null)}
+                                    className="p-2 rounded-full hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors ml-4 flex-shrink-0"
+                                    aria-label="Close"
+                                >
+                                    <Icon name="x" className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            {/* Tijelo modala sa kompletnom, skrolabilnom biografijom */}
+                            <div className="p-6 sm:p-8 overflow-y-auto leading-relaxed text-slate-700 text-sm sm:text-base space-y-4 whitespace-pre-line text-left">
+                                {(selectedMentor[lang] || selectedMentor['sr'])?.bio || selectedMentor.bio}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </Section>
         );
     };
