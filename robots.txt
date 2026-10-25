@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://naum.ff.unibl.org/sitemap.xml

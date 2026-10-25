@@ -330,7 +330,7 @@ function App() {
         };
     }, []);
 
-    const [faqList, setFaqList] = useState(DEFAULT_FAQ);
+    const [faqList, setFaqList] = useState(DEFAULT_FAQ);    
 
     // Fetch live FAQ from Google Sheet
     useEffect(() => {
@@ -374,6 +374,26 @@ function App() {
         document.documentElement.lang = lang === 'en' ? 'en' : 'sr';
         localStorage.setItem('naum_lang', lang);
     }, [lang]);
+
+    // 🌐 DINAMIČKI SEO: Automatski ažurira naslov taba, meta opis i jezik dokumenta
+    useEffect(() => {
+        const seo = t?.seo;
+        if (!seo) return;
+
+        // 1. Dinamički naslov taba: npr. "Programi i radionice | Centar za nadarenost NAUM"
+        const pageTitle = seo.titles?.[currentPage] || seo.titles?.home || '';
+        document.title = `${pageTitle} | ${seo.siteTitle}`;
+
+        // 2. Dinamički jezički tag za pretraživače
+        const htmlLang = lang === 'en' ? 'en' : (lang === 'lat' ? 'sr-Latn' : 'sr-Cyrl');
+        document.documentElement.lang = htmlLang;
+
+        // 3. Dinamički meta opis za Google
+        const metaDescEl = document.querySelector('meta[name="description"]');
+        if (metaDescEl && seo.metaDesc) {
+            metaDescEl.setAttribute('content', seo.metaDesc);
+        }
+    }, [lang, currentPage, t]);
 
     // 1. Fetch live programs
     useEffect(() => {

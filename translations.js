@@ -7,6 +7,19 @@ window.I18N = {
         facultySub: "Филозофски факултет Универзитета у Бањој Луци",
         submitting: "Слање података...",
         closedNotice: "Хвала на интересовању, пријаве су тренутно затворене.",
+        seo: {
+            siteTitle: "Центар за надареност НАУМ",
+            metaDesc: "Центар за надареност НАУМ при Филозофском факултету Универзитета у Бањој Луци. Откривамо и развијамо таленте будућности кроз образовне програме, радионице и менторски рад.",
+            titles: {
+                home: "Почетна",
+                about: "О нама",
+                programs: "Програми и радионице",
+                mentors: "Ментори",
+                apply: "Упис полазника",
+                news: "Вијести и догађаји",
+                contact: "Контакт"
+            }
+        },
         nav: {
             home: "Почетна",
             about: "О нама",
@@ -182,6 +195,19 @@ window.I18N = {
         facultySub: "Filozofski fakultet Univerziteta u Banjoj Luci",
         submitting: "Slanje podataka...",
         closedNotice: "Hvala na interesovanju, prijave su trenutno zatvorene.",
+        seo: {
+            siteTitle: "Centar za nadarenost NAUM",
+            metaDesc: "Centar za nadarenost NAUM pri Filozofskom fakultetu Univerziteta u Banjoj Luci. Otkrivamo i razvijamo talente budućnosti kroz obrazovne programe, radionice i mentorski rad.",
+            titles: {
+                home: "Početna",
+                about: "O nama",
+                programs: "Programi i radionice",
+                mentors: "Mentori",
+                apply: "Upis polaznika",
+                news: "Vijesti i događaji",
+                contact: "Kontakt"
+            }
+        },
         nav: {
             home: "Početna",
             about: "O nama",
@@ -357,6 +383,19 @@ window.I18N = {
         facultySub: "Faculty of Philosophy, University of Banja Luka",
         submitting: "Submitting...",
         closedNotice: "Thank you for your interest. Applications for this program are currently closed.",
+        seo: {
+            siteTitle: "Center for Giftedness NAUM",
+            metaDesc: "NAUM Center for Giftedness at the Faculty of Philosophy, University of Banja Luka. Discovering and nurturing future talents through academic programs, workshops, and mentorship.",
+            titles: {
+                home: "Home",
+                about: "About Us",
+                programs: "Programs & Workshops",
+                mentors: "Mentors",
+                apply: "Participant Registration",
+                news: "News & Events",
+                contact: "Contact"
+            }
+        },
         nav: {
             home: "Home",
             about: "About",
