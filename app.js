@@ -270,7 +270,7 @@ const LanguageSelector = ({ currentLang, onSelectLang }) => {
 
 const getPageFromHash = () => {
     const hash = window.location.hash.replace('#', '').trim();
-    const validPages = ['home', 'about', 'programs', 'mentors', 'apply', 'news', 'contact'];
+    const validPages = ['home', 'about', 'programs', 'mentors', 'apply', 'news', 'contact', 'volunteer'];
     return validPages.includes(hash) ? hash : 'home';
 };
 
@@ -764,6 +764,9 @@ function App() {
                             </Button>
                             <Button variant="ghost-white" onClick={() => navigateTo('mentors-apply')} className="w-full sm:w-auto">
                                 {t?.hero?.btnMentor || "Постани ментор"}
+                            </Button>
+                            <Button variant="secondary" onClick={() => navigateTo('volunteer')} className="w-full sm:w-auto bg-white/95 text-slate-800 hover:bg-white">
+                                {t?.hero?.btnVolunteer || "Постани волонтер"}
                             </Button>
                         </div>
                     </div>
@@ -1640,6 +1643,92 @@ function App() {
         );
     };
 
+    const VolunteerView = () => {
+        const [form, setForm] = useState({ name: '', facultyProgram: '', email: '', phone: '', motivation: '', hp_trap: '' });
+        const [isSubmitting, setIsSubmitting] = useState(false);
+        const [statusMessage, setStatusMessage] = useState('');
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            setIsSubmitting(true);
+            setStatusMessage('');
+
+            try {
+                await submitToGoogleSheet({
+                    formType: 'volunteer',
+                    lang: lang,
+                    ...form
+                });
+                setStatusMessage(t?.volunteer?.successMsg || "Хвала на пријави!");
+                setForm({ name: '', facultyProgram: '', email: '', phone: '', motivation: '', hp_trap: '' });
+                trackEvent('submit_volunteer_application');
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                setIsSubmitting(false);
+            }
+        };
+
+        return (
+            <Section>
+                <div className="max-w-2xl mx-auto">
+                    <div className="text-center mb-8">
+                        <span className="text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+                            {t?.volunteer?.tag || "Волонтери"}
+                        </span>
+                        <h1 className="text-4xl font-extrabold text-slate-900 mt-3 mb-2">{t?.volunteer?.title || "Постани волонтер"}</h1>
+                        <p className="text-slate-500 text-sm">{t?.volunteer?.subtitle}</p>
+                    </div>
+
+                    <Card className="border-t-4 border-teal-500 shadow-md">
+                        {statusMessage && (
+                            <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center gap-2">
+                                <Icon name="check-circle" className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                                <span>{statusMessage}</span>
+                            </div>
+                        )}
+
+                        <form className="space-y-4" onSubmit={handleSubmit}>
+                            <div style={{ display: 'none' }} aria-hidden="true">
+                                <input type="text" name="hp_trap" value={form.hp_trap} onChange={e => setForm({ ...form, hp_trap: e.target.value })} tabIndex="-1" autoComplete="off" />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1">{t?.volunteer?.nameLabel || "Име и Презиме"}</label>
+                                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder={t?.volunteer?.namePh} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-teal-500" required />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1">{t?.volunteer?.facultyLabel || "Факултет и студијски програм"}</label>
+                                <input type="text" value={form.facultyProgram} onChange={e => setForm({ ...form, facultyProgram: e.target.value })} placeholder={t?.volunteer?.facultyPh} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-teal-500" required />
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 mb-1">{t?.volunteer?.emailLabel || "Е-маил"}</label>
+                                    <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder={t?.volunteer?.emailPh} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-teal-500" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 mb-1">{t?.volunteer?.phoneLabel || "Телефон"}</label>
+                                    <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder={t?.volunteer?.phonePh} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-teal-500" required />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 mb-1">{t?.volunteer?.motivationLabel || "Зашто желим да волонтирам?"}</label>
+                                <textarea rows="4" value={form.motivation} onChange={e => setForm({ ...form, motivation: e.target.value })} placeholder={t?.volunteer?.motivationPh} className="w-full p-3 rounded-xl border border-slate-200 text-sm outline-none focus:ring-2 focus:ring-teal-500" required></textarea>
+                            </div>
+
+                            <Button variant="primary" type="submit" disabled={isSubmitting} className="w-full mt-2">
+                                {isSubmitting ? (t?.submitting || "Слање...") : (t?.volunteer?.submitBtn || "Пошаљи пријаву")}
+                            </Button>
+                        </form>
+                    </Card>
+                </div>
+            </Section>
+        );
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
             <div className="h-1.5 w-full bg-gradient-to-r from-emerald-400 via-cyan-400 via-pink-500 to-amber-400"></div>
@@ -1849,6 +1938,7 @@ function App() {
                 {currentPage === 'apply' && <ApplyView />}
                 {currentPage === 'news' && <NewsView />}
                 {currentPage === 'contact' && <ContactView />}
+                {currentPage === 'volunteer' && <VolunteerView />}
             </main>
 
             <footer className="bg-slate-950 text-slate-400 py-12 md:py-16 border-t border-slate-900 mt-16">
@@ -1887,6 +1977,7 @@ function App() {
                             <li><button onClick={() => navigateTo('mentors-our')} className="hover:text-teal-400">{t?.nav?.mentorsSub?.ourMentors || "Наши ментори"}</button></li>
                             <li><button onClick={() => navigateTo('friends-list')} className="hover:text-teal-400">{t?.nav?.friends || "Пријатељи НАУМ-а"}</button></li>
                             <li><button onClick={() => navigateTo('friends-support')} className="hover:text-teal-400">{t?.nav?.friendsSub?.support || "Подржи рад Центра"}</button></li>
+                            <li><button onClick={() => navigateTo('volunteer')} className="hover:text-teal-400">{t?.hero?.btnVolunteer || "Постани волонтер"}</button></li>
                             <li><button onClick={() => navigateTo('apply')} className="hover:text-teal-400">{t?.nav?.apply || "Пријаве"}</button></li>
                             <li><button onClick={() => navigateTo('faq')} className="hover:text-teal-400">{t?.footer?.faq || "Често постављана питања"}</button></li>
                             <li><button onClick={() => navigateTo('news')} className="hover:text-teal-400">{t?.nav?.news || "Вијести"}</button></li>

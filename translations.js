@@ -51,6 +51,7 @@ window.I18N = {
             title2: "таленте будућности",
             desc: "НАУМ је мјесто гдје радозналост сусреће знање. Повезујемо надарену и талентовану дјецу и младе, посвећене менторе и савремене научне методе.",
             btnApply: "Пријави дијете",
+            btnVolunteer: "Постани волонтер",
             btnMentor: "Постани ментор"
         },
         missionShort: {
@@ -186,7 +187,24 @@ window.I18N = {
             contactInfo: "Контакт инфо",
             addressLine: "Булевар војводе Петра Бојовића 1А",
             locationLine: "Бања Лука, Република Српска"
-        }
+        },
+        volunteer: {
+            tag: "Волонтерски програм",
+            title: "Постани волонтер Центра НАУМ",
+            subtitle: "Придружи се нашем тиму и стекни драгоцјено искуство у раду са даровитом дјецом и младима.",
+            nameLabel: "Име и Презиме",
+            namePh: "нпр. Ана Анић",
+            facultyLabel: "Факултет и студијски програм",
+            facultyPh: "нпр. Филозофски факултет, Одсјек за психологију",
+            emailLabel: "Е-маил адреса",
+            emailPh: "ana@gmail.com",
+            phoneLabel: "Број телефона",
+            phonePh: "+387 6...",
+            motivationLabel: "Зашто желим да волонтирам у НАУМ-у?",
+            motivationPh: "Опишите своја очекивања, интересовања и како можете допринијети раду са дјецом...",
+            submitBtn: "Пошаљи волонтерску пријаву",
+            successMsg: "Хвала на пријави за волонтирање! Наш тим ће вас контактирати убрзо."
+        },
     },
     lat: {
         brandSub: "Centar za nadarenost NAUM",
@@ -239,6 +257,7 @@ window.I18N = {
             title2: "talente budućnosti",
             desc: "NAUM je mjesto gdje radoznalost susreće znanje. Povezujemo nadarenu i talentovanu djecu i mlade, posvećene mentore i savremene naučne metode.",
             btnApply: "Prijavi dijete",
+            btnVolunteer: "Postani volonter",
             btnMentor: "Postani mentor"
         },
         missionShort: {
@@ -374,7 +393,24 @@ window.I18N = {
             contactInfo: "Kontakt info",
             addressLine: "Bulevar vojvode Petra Bojovića 1A",
             locationLine: "Banja Luka, Republika Srpska"
-        }
+        },
+        volunteer: {
+            tag: "Volonterski program",
+            title: "Postani volonter Centra NAUM",
+            subtitle: "Pridruži se našem timu i stekni dragocjeno iskustvo u radu sa darovitom djecom i mladima.",
+            nameLabel: "Ime i Prezime",
+            namePh: "npr. Ana Anić",
+            facultyLabel: "Fakultet i studijski program",
+            facultyPh: "npr. Filozofski fakultet, Odsjek za psihologiju",
+            emailLabel: "E-mail adresa",
+            emailPh: "ana@gmail.com",
+            phoneLabel: "Broj telefona",
+            phonePh: "+387 6...",
+            motivationLabel: "Zašto želim da volontiram u NAUM-u?",
+            motivationPh: "Opišite svoja očekivanja, interesovanja i kako možete doprinijeti radu sa djecom...",
+            submitBtn: "Pošalji volontersku prijavu",
+            successMsg: "Hvala na prijavi za volontiranje! Naš tim će vas kontaktirati ubrzo."
+        },
     },
     en: {
         brandSub: "Center for Giftedness NAUM",
@@ -427,6 +463,7 @@ window.I18N = {
             title2: "talents of the future",
             desc: "NAUM is a place where curiosity meets knowledge. We connect gifted and talented children and youth, dedicated mentors, and modern scientific approaches.",
             btnApply: "Register a Child",
+            btnVolunteer: "Become a Volunteer",
             btnMentor: "Become a Mentor"
         },
         missionShort: {
@@ -562,6 +599,23 @@ window.I18N = {
             contactInfo: "Contact Info",
             addressLine: "Bulevar vojvode Petra Bojovica 1A",
             locationLine: "Banja Luka, Republic of Srpska"
+        },
+        volunteer: {
+            tag: "Volunteer Program",
+            title: "Become a Volunteer at NAUM",
+            subtitle: "Join our team and gain invaluable experience working with gifted children and youth.",
+            nameLabel: "Full Name",
+            namePh: "e.g., Ana Anic",
+            facultyLabel: "Faculty & Study Program",
+            facultyPh: "e.g., Faculty of Philosophy, Psychology Department",
+            emailLabel: "Email Address",
+            emailPh: "ana@gmail.com",
+            phoneLabel: "Phone Number",
+            phonePh: "+387 6...",
+            motivationLabel: "Why do you want to volunteer at NAUM?",
+            motivationPh: "Tell us about your motivation, skills, and how you would like to contribute...",
+            submitBtn: "Submit Volunteer Application",
+            successMsg: "Thank you for applying to volunteer! Our team will contact you shortly."
         }
     }
 };

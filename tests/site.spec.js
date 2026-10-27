@@ -424,4 +424,64 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
         await page.click('button[title="Ћирилица"]');
     });
 
+    // -------------------------------------------------------------
+    // 17. VOLUNTEER APPLICATION FLOW
+    // -------------------------------------------------------------
+    test('19. Volunteer flow: hero button navigates to form, fields validate, and submits successfully', async ({ page }) => {
+        // Presrećemo Google Apps Script mrežni poziv
+        await page.route('**/*script.google.com/**', route => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ status: 'success' })
+            });
+        });
+
+        // 1. Provjera navigacije sa početnog Hero banera
+        await page.goto('/#home');
+        const heroVolunteerBtn = page.locator('main button:has-text("Постани волонтер")');
+        await expect(heroVolunteerBtn).toBeVisible();
+        await heroVolunteerBtn.click();
+
+        // Treba da pređe na #volunteer
+        await expect(page).toHaveURL(/#volunteer/);
+        await expect(page.locator('h1:has-text("Постани волонтер")')).toBeVisible();
+
+        // 2. Precizno gađamo VIDLJIVA polja (preskačemo skriveni honeypot)
+        const nameInput = page.locator('form input:visible').nth(0);
+        const facultyInput = page.locator('form input:visible').nth(1);
+        const emailInput = page.locator('form input[type="email"]');
+        const phoneInput = page.locator('form input[type="tel"]');
+        const motivationTextarea = page.locator('form textarea');
+        const honeypot = page.locator('input[name="hp_trap"]').first();
+
+        await expect(nameInput).toBeVisible();
+        await expect(facultyInput).toBeVisible();
+        await expect(emailInput).toBeVisible();
+        await expect(phoneInput).toBeVisible();
+        await expect(motivationTextarea).toBeVisible();
+        await expect(honeypot).toBeHidden();
+
+        // 3. Popunjavanje forme i slanje prijave
+        await nameInput.fill('Марко Марковић');
+        await facultyInput.fill('Филозофски факултет, Одсјек за психологију');
+        await emailInput.fill('marko.volonter@gmail.com');
+        await phoneInput.fill('+38765123456');
+        await motivationTextarea.fill('Желим да помогнем у развоју даровите дјеце и стекнем практично искуство у НАУМ-у.');
+
+        const submitBtn = page.locator('form button[type="submit"]');
+        await submitBtn.click();
+
+        // 4. Provjera poruke o uspješnom slanju
+        const successBanner = page.locator('text=Хвала на пријави за волонтирање');
+        await expect(successBanner).toBeVisible();
+
+        // 5. Provjera prevođenja na Latinicu (LAT)
+        await page.click('button[title="Latinica"]');
+        await expect(page.locator('h1:has-text("Postani volonter")')).toBeVisible();
+
+        // Vraćanje na ćirilicu
+        await page.click('button[title="Ћирилица"]');
+    });
+
 });
