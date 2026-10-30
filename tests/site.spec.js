@@ -247,7 +247,9 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
                 if (scenario.abort) return route.abort('failed');
                 return route.fulfill({
                     status: scenario.status,
-                    headers: scenario.corsDenied ? {} : { 'Access-Control-Allow-Origin': '*' },
+                    // Playwright adds an allowing CORS header if it is omitted.
+                    // An explicit different origin simulates an actual denial.
+                    headers: { 'Access-Control-Allow-Origin': scenario.corsDenied ? 'https://unrelated.example.test' : '*' },
                     contentType: 'image/png',
                     body: scenario.invalidBody ? Buffer.from('not an image') : png,
                 });
