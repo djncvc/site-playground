@@ -274,6 +274,63 @@ const getPageFromHash = () => {
     return validPages.includes(hash) ? hash : 'home';
 };
 
+// Validate HTTP status before displaying a photo: hosts can return error images
+// with a 4xx/5xx status that an ordinary <img> would still display.
+const MentorAvatar = ({ mentor, name = '', compact = false }) => {
+    const photoUrl = mentor.photoUrl?.trim() || '';
+    const [photo, setPhoto] = useState(null);
+
+    useEffect(() => {
+        if (!photoUrl) return;
+        const controller = new AbortController();
+        let active = true;
+        let objectUrl;
+
+        const loadPhoto = async () => {
+            try {
+                // CORS must allow reading the response; opaque responses cannot
+                // be checked and must use the same fallback as missing photos.
+                const response = await fetch(photoUrl, { signal: controller.signal });
+                if (!response.ok) return;
+                const blob = await response.blob();
+                if (!active) return;
+                objectUrl = URL.createObjectURL(blob);
+                setPhoto({ source: photoUrl, objectUrl });
+            } catch {
+                // Network failures, CORS denial and cancellation use the icon.
+            }
+        };
+        loadPhoto();
+
+        return () => {
+            active = false;
+            controller.abort();
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
+    }, [photoUrl]);
+
+    const imageUrl = photo?.source === photoUrl ? photo.objectUrl : null;
+    return (
+        <div
+            data-mentor-avatar
+            className={`${compact ? 'w-16 h-16' : 'w-24 h-24'} rounded-full bg-gradient-to-tr ${mentor.avatarBg || 'from-teal-500 to-emerald-600'} text-white flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden`}
+        >
+            {imageUrl ? (
+                <img
+                    src={imageUrl}
+                    alt={name}
+                    onError={() => setPhoto(null)}
+                    className="w-full h-full rounded-full object-cover border-2 border-teal-500"
+                />
+            ) : (
+                <span aria-hidden="true">
+                    <Icon name="user" className={compact ? 'w-8 h-8' : 'w-12 h-12'} />
+                </span>
+            )}
+        </div>
+    );
+};
+
 // --- MAIN APP COMPONENT ---
 function App() {
     const [lang, setLang] = useState(() => localStorage.getItem('naum_lang') || 'sr');
@@ -1048,17 +1105,7 @@ function App() {
                                 <Card key={mentor.id} className="flex flex-col text-center items-center hover:border-teal-300 transition-all p-6 sm:p-8 h-full">
                                     {/* Fotografija ili Avatar */}
                                     <div className="flex-shrink-0 mb-4">
-                                        {mentor.photoUrl ? (
-                                            <img 
-                                                src={mentor.photoUrl} 
-                                                alt={mentorName} 
-                                                className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-teal-500" 
-                                            />
-                                        ) : (
-                                            <div className={`w-24 h-24 rounded-full bg-gradient-to-tr ${mentor.avatarBg || "from-teal-500 to-emerald-600"} text-white flex items-center justify-center text-2xl font-extrabold shadow-lg`}>
-                                                {mentor.initials || "М"}
-                                            </div>
-                                        )}
+                                        <MentorAvatar mentor={mentor} name={mentorName} />
                                     </div>
 
                                     {/* Zaglavlje kartice (Ime, oblast, zvanje sa fiksnom minimalnom visinom) */}
@@ -1154,17 +1201,7 @@ function App() {
                             {/* Zaglavlje modala sa slikom, imenom i dugmetom 'X' */}
                             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 flex-shrink-0">
                                 <div className="flex items-center gap-4">
-                                    {selectedMentor.photoUrl ? (
-                                        <img 
-                                            src={selectedMentor.photoUrl} 
-                                            alt="" 
-                                            className="w-16 h-16 rounded-full object-cover border-2 border-teal-500 shadow-sm flex-shrink-0" 
-                                        />
-                                    ) : (
-                                        <div className={`w-16 h-16 rounded-full bg-gradient-to-tr ${selectedMentor.avatarBg || "from-teal-500 to-emerald-600"} text-white flex items-center justify-center text-xl font-extrabold shadow flex-shrink-0`}>
-                                            {selectedMentor.initials}
-                                        </div>
-                                    )}
+                                    <MentorAvatar mentor={selectedMentor} compact />
                                     <div className="text-left">
                                         <h3 className="text-xl font-bold text-slate-900 leading-snug">
                                             {(selectedMentor[lang] || selectedMentor['sr'])?.name || selectedMentor.name}

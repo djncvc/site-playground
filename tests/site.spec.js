@@ -221,6 +221,68 @@ test.describe('NAUM Website - Comprehensive E2E Test Suite', () => {
         expect(count).toBeGreaterThanOrEqual(2);
     });
 
+    // A valid image body can still represent an HTTP error. Mock both the
+    // status and body so this regression cannot pass with onError alone.
+    for (const scenario of [
+        { name: 'successful image', status: 200, showsPhoto: true },
+        { name: '503 with valid image body', status: 503 },
+        { name: '404 with valid image body', status: 404 },
+        { name: 'undecodable image', status: 200, invalidBody: true },
+        { name: 'network failure', abort: true },
+        { name: 'CORS denied', status: 200, corsDenied: true },
+    ]) {
+        test(`Mentor avatars handle ${scenario.name} in cards and biography modal`, async ({ page }) => {
+            const photoUrl = 'https://photos.example.test/mentor.png';
+            const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aP1sAAAAASUVORK5CYII=', 'base64');
+
+            await page.route('**/*output=csv*', route => {
+                if (!route.request().url().includes('mentor')) return route.fallback();
+                return route.fulfill({
+                    status: 200,
+                    contentType: 'text/csv',
+                    body: MOCK_MENTORS_CSV.replace('Biography of mentor Dragana.,', `Biography of mentor Dragana.,${photoUrl}`),
+                });
+            });
+            await page.route(photoUrl, route => {
+                if (scenario.abort) return route.abort('failed');
+                return route.fulfill({
+                    status: scenario.status,
+                    headers: scenario.corsDenied ? {} : { 'Access-Control-Allow-Origin': '*' },
+                    contentType: 'image/png',
+                    body: scenario.invalidBody ? Buffer.from('not an image') : png,
+                });
+            });
+
+            await page.goto('/#mentors');
+            const avatars = page.locator('#our-mentors-section [data-mentor-avatar]');
+            await expect(avatars).toHaveCount(2);
+            await page.waitForLoadState('networkidle');
+
+            const checkAvatar = async avatar => {
+                if (scenario.showsPhoto) {
+                    await expect(avatar.locator('img')).toBeVisible();
+                    await expect.poll(() => avatar.locator('img').evaluate(img => img.naturalWidth)).toBeGreaterThan(0);
+                    await expect(avatar.locator('svg')).toHaveCount(0);
+                } else {
+                    await expect(avatar.locator('svg')).toBeVisible();
+                    await expect(avatar.locator('img')).toHaveCount(0);
+                }
+            };
+            await checkAvatar(avatars.first());
+            // A mentor without any photo URL uses the exact same icon.
+            await expect(avatars.nth(1).locator('svg')).toBeVisible();
+            if (!scenario.showsPhoto) {
+                expect(await avatars.first().locator('svg').innerHTML()).toBe(await avatars.nth(1).locator('svg').innerHTML());
+            }
+
+            await page.locator('#our-mentors-section button').first().click();
+            const modalAvatar = page.locator('.fixed.inset-0.z-50 [data-mentor-avatar]');
+            await expect(modalAvatar).toBeVisible();
+            await page.waitForLoadState('networkidle');
+            await checkAvatar(modalAvatar);
+        });
+    }
+
     // -------------------------------------------------------------
     // 8. PARTNERS (PRIJATELJI NAUM-A) & SUPPORT FORM
     // -------------------------------------------------------------
